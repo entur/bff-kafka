@@ -1,0 +1,23 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "baseUrl": ".",
+        "esModuleInterop": true,
+        "lib": ["es2020"],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "dist",
+        "strict": true,
+        "paths": {
+            "*": ["node_modules/*"]
+        },
+        "sourceMap": true,
+        "target": "es2019"
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules/*"
+    ]
+}
