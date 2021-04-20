@@ -25,10 +25,7 @@ module.exports = {
         '@typescript-eslint/ban-ts-comment': 'warn',
         '@typescript-eslint/consistent-type-assertions': 'error',
         '@typescript-eslint/consistent-type-definitions': 'error',
-        '@typescript-eslint/explicit-function-return-type': [
-            'warn',
-            { allowExpressions: true },
-        ],
+        '@typescript-eslint/explicit-function-return-type': ['warn', { allowExpressions: true }],
         '@typescript-eslint/explicit-member-accessibility': [
             'error',
             { accessibility: 'explicit' },
@@ -102,10 +99,7 @@ module.exports = {
         'no-unused-expressions': 'error',
         'no-use-before-define': 'off',
         'no-var': 'error',
-        'no-warning-comments': [
-            'warn',
-            { terms: ['TODO'], location: 'anywhere' },
-        ],
+        'no-warning-comments': ['warn', { terms: ['TODO'], location: 'anywhere' }],
         'object-shorthand': ['error', 'always'],
         'one-var': ['error', 'never'],
         'prefer-arrow-callback': ['error', { allowNamedFunctions: true }],

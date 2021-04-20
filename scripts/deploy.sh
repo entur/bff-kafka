@@ -2,14 +2,14 @@
 
 set -e
 
-if [ -z "$ENTUR_DEPLOY_SLACK_WEBHOOK" ] ; then
- echo
- echo "👮‍♀️ Stop there! Could not find the Slack webhook URL. Please make sure this variable is exported:"
- echo
- echo "  ENTUR_DEPLOY_SLACK_WEBHOOK"
- echo
- exit 1
-fi
+#if [ -z "$ENTUR_DEPLOY_SLACK_WEBHOOK" ] ; then
+# echo
+# echo "👮‍♀️ Stop there! Could not find the Slack webhook URL. Please make sure this variable is exported:"
+# echo
+# echo "  ENTUR_DEPLOY_SLACK_WEBHOOK"
+# echo
+# exit 1
+#fi
 
 function deploy {
     ENV="${1:-dev}"
@@ -26,7 +26,7 @@ function deploy {
     npm run build:$ENV && gcloud app deploy app-$ENV.yaml --project=entur-$ENV --quiet
 
     echo " 💬 Posting message to Slack ..."
-    slack_message $ENV
+#    slack_message $ENV
 }
 
 function slack_message {
