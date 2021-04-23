@@ -27,11 +27,13 @@
   "dependencies": {
     "@google-cloud/logging-winston": "^4.0.1",
     "@google-cloud/trace-agent": "^5.1.1",
+    "@kafkajs/confluent-schema-registry": "^2.0.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
     "jwks-rsa": "^1.11.0",
+    "kafkajs": "^1.15.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {

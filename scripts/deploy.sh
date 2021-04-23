@@ -43,8 +43,8 @@ function slack_message {
         COMMIT_MSG="(\`$COMMIT\`)"
     fi
 
+        --data-urlencode "payload={\"channel\": \"#team-app-build\", \"username\": \"BFF Kafka deployed to $ENV\", \"text\": \"\`$USER\` deployed *BFF Kafka* to :$ENV: from branch \`$BRANCH\` $COMMIT_MSG\", \"icon_emoji\": \":mag:\"}" \
     curl -X POST \
-        --data-urlencode "payload={\"channel\": \"#team-app-build\", \"username\": \"BFF Kafka deployed to $ENV\", \"text\": \"\`$USER\` deployed *BFF Search* to :$ENV: from branch \`$BRANCH\` $COMMIT_MSG\", \"icon_emoji\": \":mag:\"}" \
         "$ENTUR_DEPLOY_SLACK_WEBHOOK"
 }
 

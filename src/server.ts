@@ -10,8 +10,12 @@ import { NotFoundError, InvalidArgumentError } from './errors'
 // import { unauthorizedError } from './auth'
 import testRouter from './test'
 
+import consume from './kafka';
+
 const PORT = process.env.PORT || 9000
 const app = express()
+
+consume().then(() => console.log('consumed')).catch((reason) => console.log('kafka failed', reason));
 
 app.use(
     bodyParser.json({
