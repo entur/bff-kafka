@@ -1,20 +1,27 @@
-import { KAFKA_PASSWORD, KAFKA_USER } from './secrets'
+import { getKafkaPassword, KAFKA_USER } from './secrets'
 import { Kafka, KafkaMessage } from 'kafkajs'
 import {
     SchemaRegistry,
 } from "@kafkajs/confluent-schema-registry";
 
+let kafka: Kafka | undefined;
+
 // Create the client with the broker list
-const kafka = new Kafka({
-    clientId: 'bff-kafka-client',
-    brokers: ['bootstrap.test-int.kafka.entur.io:9095'],
-    ssl: true,
-    sasl: {
-        mechanism: 'scram-sha-512',
-        username: KAFKA_USER,
-        password: KAFKA_PASSWORD
-    },
-})
+const getKafka = async () => {
+    if(!kafka) {
+        kafka = new Kafka({
+            clientId: 'bff-kafka-client',
+            brokers: ['bootstrap.test-int.kafka.entur.io:9095'],
+            ssl: true,
+            sasl: {
+                mechanism: 'scram-sha-512',
+                username: KAFKA_USER,
+                password: await getKafkaPassword()
+            },
+        })
+    }
+    return kafka;
+}
 
 // If we use AVRO, we need to configure a Schema Registry
 // which keeps track of the schema
@@ -23,7 +30,7 @@ const registry = new SchemaRegistry({
 });
 
 const consume = async () => {
-    const consumer = kafka.consumer({ groupId: 'bff-kafka' })
+    const consumer = (await getKafka()).consumer({ groupId: 'bff-kafka' })
     try {
         await consumer.subscribe({ topic: 'payment-events-dev', fromBeginning: true })
         console.log('subscribed');

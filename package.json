@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@google-cloud/logging-winston": "^4.0.1",
+    "@google-cloud/secret-manager": "^3.6.0",
     "@google-cloud/trace-agent": "^5.1.1",
     "@kafkajs/confluent-schema-registry": "^2.0.1",
     "body-parser": "^1.19.0",
