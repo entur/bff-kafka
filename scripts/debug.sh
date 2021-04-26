@@ -3,11 +3,14 @@ set -e
 
 ENV="${1:-dev}"
 
+# path to environment specific credential keys used when looking up secrets
+export GOOGLE_APPLICATION_CREDENTIALS="$PWD/serviceAccountKeys/entur-$ENV.json"
+
 # Run transpile in a forked process
 npm run transpile -- --watch &
-TRANSPILE_PID=$! 
+TRANSPILE_PID=$!
 npm run populate-env-vars $ENV -- --watch &
-ENVIRONMENT_PID=$! 
+ENVIRONMENT_PID=$!
 
 sleep 12
 if [ "$2" == "--inspect" ]; then

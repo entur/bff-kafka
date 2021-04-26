@@ -1,54 +1,61 @@
-import { getKafkaPassword, KAFKA_USER } from './secrets'
+import { getSecret } from './secrets'
 import { Kafka, KafkaMessage } from 'kafkajs'
-import {
-    SchemaRegistry,
-} from "@kafkajs/confluent-schema-registry";
+import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
+import { KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 
-let kafka: Kafka | undefined;
+let kafka: Kafka | undefined
 
-// Create the client with the broker list
 const getKafka = async () => {
-    if(!kafka) {
+    if (!kafka) {
+        const [username, password] = await Promise.all([
+            getSecret('kafka-user'),
+            getSecret('kafka-password'),
+        ])
+
         kafka = new Kafka({
             clientId: 'bff-kafka-client',
-            brokers: ['bootstrap.test-int.kafka.entur.io:9095'],
+            brokers: [KAFKA_BROKER || ''],
             ssl: true,
             sasl: {
                 mechanism: 'scram-sha-512',
-                username: KAFKA_USER,
-                password: await getKafkaPassword()
+                username,
+                password,
             },
         })
     }
-    return kafka;
+    return kafka
 }
 
-// If we use AVRO, we need to configure a Schema Registry
+// Since we use AVRO, we need to configure a Schema Registry
 // which keeps track of the schema
 const registry = new SchemaRegistry({
-    host: "http://schema-registry.test-int.kafka.entur.io:8001",
-});
+    host: KAFKA_SCHEMA_REGISTRY || '',
+})
 
 const consume = async () => {
     const consumer = (await getKafka()).consumer({ groupId: 'bff-kafka' })
     try {
         await consumer.subscribe({ topic: 'payment-events-dev', fromBeginning: true })
-        console.log('subscribed');
+        console.log('subscribed')
         await consumer.run({
             autoCommit: false,
-            eachMessage: async ({ topic, partition, message }: {topic: string, partition: number, message: KafkaMessage}) => {
-                console.log('got a message');
+            eachMessage: async ({
+                message,
+            }: {
+                topic: string
+                partition: number
+                message: KafkaMessage
+            }) => {
+                console.log('got a message')
                 if (message.value) {
-                    const value = await registry.decode(message.value);
-                    console.log(value);
+                    const value = await registry.decode(message.value)
+                    console.log(value)
                 }
             },
         })
-    } catch(err){
+    } catch (err) {
         console.log('Failed to consume', err)
     }
-
 }
 
-export default consume;
-
+export default consume
