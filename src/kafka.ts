@@ -2,6 +2,7 @@ import { getSecret } from './secrets'
 import { Kafka, KafkaMessage } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import { KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
+import { publishMessage } from './pubsub'
 
 let kafka: Kafka | undefined
 
@@ -49,6 +50,7 @@ const consume = async () => {
                 console.log('got a message')
                 if (message.value) {
                     const value = await registry.decode(message.value)
+                    await publishMessage(value)
                     console.log(value)
                 }
             },

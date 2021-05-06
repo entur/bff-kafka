@@ -376,6 +376,11 @@
     arrify "^2.0.0"
     extend "^3.0.2"
 
+"@google-cloud/precise-date@^2.0.0":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@google-cloud/precise-date/-/precise-date-2.0.3.tgz#14f6f28ce35dabf3882e7aeab1c9d51bd473faed"
+  integrity sha512-+SDJ3ZvGkF7hzo6BGa8ZqeK3F6Z4+S+KviC9oOK+XCs3tfMyJCh/4j93XIWINgMMDIh9BgEvlw4306VxlXIlYA==
+
 "@google-cloud/projectify@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@google-cloud/projectify/-/projectify-2.0.1.tgz#13350ee609346435c795bbfe133a08dfeab78d65"
@@ -385,6 +390,27 @@
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@google-cloud/promisify/-/promisify-2.0.3.tgz#f934b5cdc939e3c7039ff62b9caaf59a9d89e3a8"
   integrity sha512-d4VSA86eL/AFTe5xtyZX+ePUjE8dIFu2T8zmdeNBSa5/kNgXPCx/o/wbFNHAGLJdGnk1vddRuMESD9HbOC8irw==
+
+"@google-cloud/pubsub@^2.11.0":
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/pubsub/-/pubsub-2.11.0.tgz#f613983c6944a2afc7d82434232b25d128655ff7"
+  integrity sha512-j9sIjVLFqSEVrAZdrGbmu4GVVuCW70Sg6/EBKSMjNKhN/ctQsgcP6kUVLVnnrrTWVF0+FfdlfuCHtdYxGy7mfw==
+  dependencies:
+    "@google-cloud/paginator" "^3.0.0"
+    "@google-cloud/precise-date" "^2.0.0"
+    "@google-cloud/projectify" "^2.0.0"
+    "@google-cloud/promisify" "^2.0.0"
+    "@opentelemetry/api" "^0.18.1"
+    "@opentelemetry/semantic-conventions" "^0.18.2"
+    "@types/duplexify" "^3.6.0"
+    "@types/long" "^4.0.0"
+    arrify "^2.0.0"
+    extend "^3.0.2"
+    google-auth-library "^7.0.0"
+    google-gax "^2.9.2"
+    is-stream-ended "^0.1.4"
+    lodash.snakecase "^4.1.1"
+    p-defer "^3.0.0"
 
 "@google-cloud/secret-manager@^3.6.0":
   version "3.6.0"
@@ -646,6 +672,16 @@
     hex2dec "^1.0.1"
     uuid "^8.0.0"
 
+"@opentelemetry/api@^0.18.1":
+  version "0.18.1"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-0.18.1.tgz#fb499e07afa1f55acffc47b2469eb218dcdee2a2"
+  integrity sha512-pKNxHe3AJ5T2N5G3AlT9gx6FyF5K2FS9ZNc+FipC+f1CpVF/EY+JHTJ749dnM2kWIgZTbDJFiGMuc0FYjNSCOg==
+
+"@opentelemetry/semantic-conventions@^0.18.2":
+  version "0.18.2"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/semantic-conventions/-/semantic-conventions-0.18.2.tgz#a0f15d2ef752567713c1f59f69c6742edb03030c"
+  integrity sha512-+0P+PrP9qSFVaayNdek4P1OAGE+PEl2SsufuHDRmUpOY25Wzjo7Atyar56Trjc32jkNy4lID6ZFT6BahsR9P9A==
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"
@@ -775,6 +811,13 @@
   version "2.8.10"
   resolved "https://registry.yarnpkg.com/@types/cors/-/cors-2.8.10.tgz#61cc8469849e5bcdd0c7044122265c39cec10cf4"
   integrity sha512-C7srjHiVG3Ey1nR6d511dtDkCEjxuN9W1HWAEjGq8kpcwmNM6JJkpC0xvabM7BXTG2wDq8Eu33iH9aQKa7IvLQ==
+
+"@types/duplexify@^3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@types/duplexify/-/duplexify-3.6.0.tgz#dfc82b64bd3a2168f5bd26444af165bf0237dcd8"
+  integrity sha512-5zOA53RUlzN74bvrSGwjudssD9F3a797sDZQkiYpUOxW+WHaXTCPz4/d5Dgi6FKnOqZ2CpaTo0DhgIfsXAOE/A==
+  dependencies:
+    "@types/node" "*"
 
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
@@ -4115,6 +4158,11 @@ lodash.set@^4.0.0:
   resolved "https://registry.yarnpkg.com/lodash.set/-/lodash.set-4.3.2.tgz#d8757b1da807dde24816b0d6a84bea1a76230b23"
   integrity sha1-2HV7HagH3eJIFrDWqEvqGnYjCyM=
 
+lodash.snakecase@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.snakecase/-/lodash.snakecase-4.1.1.tgz#39d714a35357147837aefd64b5dcbb16becd8f8d"
+  integrity sha1-OdcUo1NXFHg3rv1ktdy7Fr7Nj40=
+
 lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
@@ -4589,6 +4637,11 @@ p-cancelable@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-1.1.0.tgz#d078d15a3af409220c886f1d9a0ca2e441ab26cc"
   integrity sha512-s73XxOZ4zpt1edZYZzvhqFa6uvQc1vwUa0K0BdtIZgQMAJj9IbebH+JkgKZc9h+B05PKHLOTl4ajG1BmNrVZlw==
+
+p-defer@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/p-defer/-/p-defer-3.0.0.tgz#d1dceb4ee9b2b604b1d94ffec83760175d4e6f83"
+  integrity sha512-ugZxsxmtTln604yeYd29EGrNhazN2lywetzpKhfmQjW/VJmhpDmWbiX+h0zL8V91R0UXkhb3KtPmyq9PZw3aYw==
 
 p-each-series@^2.1.0:
   version "2.2.0"
