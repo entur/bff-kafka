@@ -9,5 +9,6 @@ export const ENVIRONMENT: string
 
 export const KAFKA_BROKER: string
 export const KAFKA_SCHEMA_REGISTRY: string
-export const PARTNER_AUDIENCE: string
-export const PARTNER_HOST: string
+
+export const KAFKA_TOPIC_PAYMENT: string
+export const PUBSUB_TOPIC: string

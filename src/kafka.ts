@@ -1,8 +1,9 @@
 import { getSecret } from './secrets'
-import { Kafka, KafkaMessage } from 'kafkajs'
+import { Consumer, Kafka, KafkaMessage } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import { KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import { publishMessage } from './pubsub'
+import logger from './logger'
 
 let kafka: Kafka | undefined
 
@@ -33,11 +34,20 @@ const registry = new SchemaRegistry({
     host: KAFKA_SCHEMA_REGISTRY || '',
 })
 
-const consume = async () => {
-    const consumer = (await getKafka()).consumer({ groupId: 'bff-kafka' })
+let consumer: Consumer | undefined
+
+export const connectToKafka = async () => {
+    consumer = (await getKafka()).consumer({ groupId: 'bff-kafka' })
+}
+
+export const proxyToPubSub = async (topic: string) => {
+    if (!consumer) {
+        throw Error(`Cannot subscribe to Kafka topic ${topic}, consumer is undefined`)
+    }
     try {
-        await consumer.subscribe({ topic: 'payment-events-dev', fromBeginning: true })
-        console.log('subscribed')
+        logger.info(`Trying to subscribe to Kafka topic ${topic}`)
+        await consumer.subscribe({ topic, fromBeginning: true })
+        logger.info(`Subscribed to Kafka topic ${topic}`)
         await consumer.run({
             autoCommit: false,
             eachMessage: async ({
@@ -47,17 +57,16 @@ const consume = async () => {
                 partition: number
                 message: KafkaMessage
             }) => {
-                console.log('got a message')
+                logger.info(`Got kafka event`)
                 if (message.value) {
                     const value = await registry.decode(message.value)
-                    await publishMessage(value)
-                    console.log(value)
+                    logger.info(`Decoded avro value is ${value}`)
+                    const eventName = value.eventName
+                    await publishMessage(value, eventName)
                 }
             },
         })
     } catch (err) {
-        console.log('Failed to consume', err)
+        logger.error(`Failed to consume ${topic}`, err)
     }
 }
-
-export default consume
