@@ -3,7 +3,7 @@ import './tracer'
 
 import logger from './logger'
 
-import { KAFKA_TOPIC_PAYMENT } from './config'
+import { KAFKA_TOPICS } from './config'
 import { connectToKafka, proxyToPubSub } from './kafka'
 import { ENVIRONMENT } from './config'
 
@@ -11,11 +11,15 @@ logger.info(`Starting kafka to pub sub bridge, env is ${ENVIRONMENT}.`)
 
 connectToKafka()
     .then(() => {
-        proxyToPubSub(KAFKA_TOPIC_PAYMENT)
-            .then(() => logger.info(`Consumption of ${KAFKA_TOPIC_PAYMENT} ended.`))
-            .catch((reason) =>
-                logger.error('Kafka failed, giving you up. Sorry, Rick Astley. ', reason),
-            )
+        KAFKA_TOPICS.split(',')
+            .map((topic) => topic.trim())
+            .forEach((topic) => {
+                proxyToPubSub(topic)
+                    .then(() => logger.info(`Consumption of ${topic} ended.`))
+                    .catch((reason) =>
+                        logger.error('Kafka failed, giving you up. Sorry, Rick Astley. ', reason),
+                    )
+            })
     })
     .catch((reason) => {
         logger.error('Could not conenct to Kafka. ', reason)
