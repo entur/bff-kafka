@@ -1,11 +1,12 @@
-Put the Google Service Account Keys json files for entur-staging and entur-dev here. Do
-NOT check in files (they are by default ignored by git).
+Put the Google Service Account Keys json files for entur-staging and entur-dev in this folder (serviceAccountKeys).
 
-Files must be named 
+Do NOT check in files (they are by default ignored by git).
 
-```entur-<environment>.json```
+Files must be named
+
+`entur-<environment>.json`
 
 for example `entur-staging.json`
 
-
-These can be found in LastPass (soon)
+For Entur employees, see the following page for more detailed setup instructions:
+https://enturas.atlassian.net/wiki/spaces/DK/pages/2704048286/Bff-kafka

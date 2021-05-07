@@ -7,7 +7,7 @@ import logger from './logger'
 
 let kafka: Kafka | undefined
 
-const getKafka = async () => {
+const getKafka = async (): Promise<Kafka> => {
     if (!kafka) {
         const [username, password] = await Promise.all([
             getSecret('kafka-user'),
@@ -36,11 +36,11 @@ const registry = new SchemaRegistry({
 
 let consumer: Consumer | undefined
 
-export const connectToKafka = async () => {
+export const connectToKafka = async (): Promise<void> => {
     consumer = (await getKafka()).consumer({ groupId: 'bff-kafka' })
 }
 
-export const proxyToPubSub = async (topic: string) => {
+export const proxyToPubSub = async (topic: string): Promise<void> => {
     if (!consumer) {
         throw Error(`Cannot subscribe to Kafka topic ${topic}, consumer is undefined`)
     }

@@ -1,6 +1,7 @@
 import { join } from 'path'
 import { promisify } from 'util'
 import fs from 'fs'
+import logger from '../src/logger'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -13,7 +14,7 @@ void createConfigFile()
 
 if (args.includes('--with-types')) {
     createTypeDefinition().catch((error) => {
-        console.error('Failed creating type definition', error)
+        logger.error('Failed creating type definition', error)
     })
 }
 
@@ -61,7 +62,7 @@ async function createConfigFile(): Promise<void> {
         await mkdir(join(__dirname, '..', 'dist'), { recursive: true })
         await writeFile(join(__dirname, '../dist/config.js'), content)
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         process.exit(1)
     }
 }

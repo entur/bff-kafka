@@ -16,6 +16,9 @@ npm install
 
 ## 🛠 Develop
 
+Before you can run the app locally you need to download the service account keys
+as described in [the service account keys readme.](serviceAccountKeys/README.md)
+
 Run `npm run <env>` to run the server locally.
 
 ```
