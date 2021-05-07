@@ -2,14 +2,12 @@ import { PubSub } from '@google-cloud/pubsub'
 import logger from './logger'
 import { PUBSUB_TOPIC } from './config'
 
-// Creates a client; cache this for further use
 const pubSubClient = new PubSub()
 
 export async function publishMessage(
     data: Record<string, unknown>,
     eventName: string,
 ): Promise<void> {
-    // Publishes the message as a string, e.g. "Hello, world!" or JSON.stringify(someObject)
     const dataBuffer = Buffer.from(JSON.stringify(data))
     const customAttributes = { eventName }
 

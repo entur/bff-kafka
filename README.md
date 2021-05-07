@@ -1,4 +1,4 @@
-# 🔍 Entur BFF Kafka 🔎
+# 🤖 Entur BFF Kafka 👾
 
 A backend service listening to Kafka messages
 
