@@ -1,7 +1,7 @@
 import { getSecret } from './secrets'
 import { Consumer, Kafka, KafkaMessage } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
-import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
+import { KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import { publishMessage } from './pubsub'
 import logger from './logger'
 
@@ -46,12 +46,10 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
     }
     try {
         logger.info(`Trying to subscribe to Kafka topic ${topic}`)
-        await consumer.subscribe({ topic, fromBeginning: true })
+        await consumer.subscribe({ topic })
         logger.info(`Subscribed to Kafka topic ${topic}`)
         await consumer.run({
-            // Not auto committing makes debugging easier as we can just restart
-            // the app to get new kafka messages.
-            autoCommit: ENVIRONMENT === 'prod',
+            autoCommit: true,
             eachMessage: async ({
                 message,
             }: {

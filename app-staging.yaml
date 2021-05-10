@@ -1,6 +1,4 @@
 runtime: nodejs12
 service: bff-kafka
-inbound_services:
-    - warmup
-automatic_scaling:
-  min_idle_instances: 1
+manual_scaling:
+  instances: 1
