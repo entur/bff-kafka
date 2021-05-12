@@ -62,7 +62,31 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
                     const value = await registry.decode(message.value)
                     logger.info(`Decoded avro value is ${value}`)
                     const eventName = value.eventName
-                    await publishMessage(value, eventName)
+
+                    const event = value.event
+
+                    // In reality only one value should be found - the java class name of the event (?),
+                    // but we can't know for sure what that name is.
+                    let flatEvent: Record<string, any> = {}
+                    Object.values(event).forEach((eventValue) => {
+                        if (eventValue instanceof Object) {
+                            flatEvent = {
+                                ...flatEvent,
+                                ...eventValue,
+                            }
+                        }
+                    })
+
+                    const pos = flatEvent.meta?.pos
+
+                    if (pos === 'Entur App' || pos === 'Entur Web') {
+                        value.event = flatEvent
+                        await publishMessage(value, eventName)
+                    } else {
+                        logger.info(`Did not forward message as it was not for app/web`, {
+                            correlationId: value.correlationId,
+                        })
+                    }
                 }
             },
         })
