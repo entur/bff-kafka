@@ -16,7 +16,6 @@ const getKafka = async (): Promise<Kafka> => {
 
         const broker = KAFKA_BROKER || ''
         const clientId = `bff-kafka-client-${ENVIRONMENT}`
-        logger.info(`Connecting to kafka broker ${broker} with clientId ${clientId}`)
         kafka = new Kafka({
             clientId,
             brokers: [broker],
@@ -27,6 +26,7 @@ const getKafka = async (): Promise<Kafka> => {
                 password,
             },
         })
+        logger.info(`Connected to kafka broker ${broker} with clientId ${clientId}`)
     }
     return kafka
 }
@@ -40,7 +40,9 @@ const registry = new SchemaRegistry({
 let consumer: Consumer | undefined
 
 export const connectToKafka = async (): Promise<void> => {
-    consumer = (await getKafka()).consumer({ groupId: `bff-kafka-${ENVIRONMENT}` })
+    const groupId = `bff-kafka-${ENVIRONMENT}`
+    consumer = (await getKafka()).consumer({ groupId })
+    logger.info(`Registered consumer with groupId ${groupId}`)
 }
 
 export const proxyToPubSub = async (topic: string): Promise<void> => {
