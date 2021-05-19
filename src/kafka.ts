@@ -82,12 +82,12 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
                     const pos = flatEvent.meta?.pos
 
                     if (pos === 'Entur App' || pos === 'Entur Web') {
-                        logger.info(`Decoded avro value is ${value}`)
+                        logger.info('Decoded avro value', { correlationId, avroValue: value })
                         value.event = flatEvent
                         await publishMessage(value, eventName, correlationId)
                     } else {
-                        logger.debug(`Decoded avro value is ${value}`)
-                        logger.debug(`Did not forward message as it was not for app/web`, {
+                        logger.debug('Decoded avro value', { correlationId, avroValue: value })
+                        logger.debug('Did not forward message as it was not for app/web', {
                             correlationId: value.correlationId,
                         })
                     }
