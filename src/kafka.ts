@@ -40,7 +40,7 @@ const registry = new SchemaRegistry({
 let consumer: Consumer | undefined
 
 export const connectToKafka = async (): Promise<void> => {
-    consumer = (await getKafka()).consumer({ groupId: 'bff-kafka' })
+    consumer = (await getKafka()).consumer({ groupId: `bff-kafka-${ENVIRONMENT}` })
 }
 
 export const proxyToPubSub = async (topic: string): Promise<void> => {
