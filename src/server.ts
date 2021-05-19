@@ -6,8 +6,11 @@ import logger from './logger'
 import { KAFKA_TOPICS } from './config'
 import { connectToKafka, proxyToPubSub } from './kafka'
 import { ENVIRONMENT } from './config'
+import http from './http'
 
 logger.info(`Starting kafka to pub sub bridge, env is ${ENVIRONMENT}.`)
+
+http()
 
 connectToKafka()
     .then(() => {
@@ -22,5 +25,5 @@ connectToKafka()
             })
     })
     .catch((reason) => {
-        logger.error('Could not conenct to Kafka. ', reason)
+        logger.error('Could not connect to Kafka. ', reason)
     })
