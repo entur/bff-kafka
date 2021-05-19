@@ -65,7 +65,7 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
                 logger.debug(`Got kafka event`)
                 if (message.value) {
                     const value = await registry.decode(message.value)
-                    const { eventName, event } = value
+                    const { eventName, event, correlationId } = value
 
                     // In reality only one value should be found - the java class name of the event (?),
                     // but we can't know for sure what that name is.
@@ -84,7 +84,7 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
                     if (pos === 'Entur App' || pos === 'Entur Web') {
                         logger.info(`Decoded avro value is ${value}`)
                         value.event = flatEvent
-                        await publishMessage(value, eventName)
+                        await publishMessage(value, eventName, correlationId)
                     } else {
                         logger.debug(`Decoded avro value is ${value}`)
                         logger.debug(`Did not forward message as it was not for app/web`, {

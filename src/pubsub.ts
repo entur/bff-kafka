@@ -7,6 +7,7 @@ const pubSubClient = new PubSub()
 export async function publishMessage(
     data: Record<string, unknown>,
     eventName: string,
+    correlationId: string,
 ): Promise<void> {
     const dataBuffer = Buffer.from(JSON.stringify(data))
     const customAttributes = { eventName }
@@ -15,9 +16,12 @@ export async function publishMessage(
         const messageId = await pubSubClient
             .topic(PUBSUB_TOPIC)
             .publish(dataBuffer, customAttributes)
-        logger.info(`Published ${eventName} with id ${messageId} to Pub/Sub topic ${PUBSUB_TOPIC}`)
+        logger.info(
+            `Published ${eventName} with id ${messageId} to Pub/Sub topic ${PUBSUB_TOPIC}`,
+            { correlationId },
+        )
     } catch (error) {
-        logger.error(`Received error while publishing: ${error.message}`)
+        logger.error(`Received error while publishing: ${error.message}`, { correlationId })
         throw error
     }
 }
