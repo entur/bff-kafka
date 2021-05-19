@@ -3,7 +3,7 @@ import logger from './logger'
 
 // Minimal HTTP server that accepts any calls, used for keepalive, to prevent idle timeouts.
 const httpServer = http.createServer((request: IncomingMessage, response: ServerResponse) => {
-    logger.info(`Received http request to ${request.url}`)
+    logger.debug(`Received http request to ${request.url}`)
     response.setHeader('Content-Type', 'text/html')
     response.writeHead(200)
     response.end('pong')

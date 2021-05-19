@@ -18,7 +18,7 @@ connectToKafka()
             .map((topic) => topic.trim())
             .forEach((topic) => {
                 proxyToPubSub(topic)
-                    .then(() => logger.info(`Consumption of ${topic} ended.`))
+                    .then(() => logger.info(`Consumer listening to ${topic}.`))
                     .catch((reason) =>
                         logger.error('Kafka failed, giving you up. Sorry, Rick Astley. ', reason),
                     )
