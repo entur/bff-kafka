@@ -14,9 +14,12 @@ const getKafka = async (): Promise<Kafka> => {
             getSecret('kafka-password'),
         ])
 
+        const broker = KAFKA_BROKER || ''
+        const clientId = `bff-kafka-client-${ENVIRONMENT}`
+        logger.info(`Connecting to kafka broker ${broker} with clientId ${clientId}`)
         kafka = new Kafka({
-            clientId: `bff-kafka-client-${ENVIRONMENT}`,
-            brokers: [KAFKA_BROKER || ''],
+            clientId,
+            brokers: [broker],
             ssl: true,
             sasl: {
                 mechanism: 'scram-sha-512',
