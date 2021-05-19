@@ -18,6 +18,6 @@ export async function publishMessage(
         logger.info(`Published ${eventName} with id ${messageId} to Pub/Sub topic ${PUBSUB_TOPIC}`)
     } catch (error) {
         logger.error(`Received error while publishing: ${error.message}`)
-        process.exitCode = 1
+        throw error
     }
 }
