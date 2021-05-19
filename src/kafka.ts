@@ -1,7 +1,7 @@
 import { getSecret } from './secrets'
 import { Consumer, Kafka, KafkaMessage } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
-import { KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
+import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import { publishMessage } from './pubsub'
 import logger from './logger'
 
@@ -15,7 +15,7 @@ const getKafka = async (): Promise<Kafka> => {
         ])
 
         kafka = new Kafka({
-            clientId: 'bff-kafka-client',
+            clientId: `bff-kafka-client-${ENVIRONMENT}`,
             brokers: [KAFKA_BROKER || ''],
             ssl: true,
             sasl: {
