@@ -1,5 +1,5 @@
 import { getSecret } from './secrets'
-import { Consumer, Kafka, KafkaMessage } from 'kafkajs'
+import { Consumer, EachMessagePayload, Kafka } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import { publishMessage } from './pubsub'
@@ -31,6 +31,12 @@ const getKafka = async (): Promise<Kafka> => {
     return kafka
 }
 
+export const connectToKafka = async (): Promise<void> => {
+    const groupId = `bff-kafka-${ENVIRONMENT}`
+    consumer = (await getKafka()).consumer({ groupId })
+    logger.info(`Registered consumer with groupId ${groupId}`)
+}
+
 // Since we use AVRO, we need to configure a Schema Registry
 // which keeps track of the schema
 const registry = new SchemaRegistry({
@@ -39,10 +45,61 @@ const registry = new SchemaRegistry({
 
 let consumer: Consumer | undefined
 
-export const connectToKafka = async (): Promise<void> => {
-    const groupId = `bff-kafka-${ENVIRONMENT}`
-    consumer = (await getKafka()).consumer({ groupId })
-    logger.info(`Registered consumer with groupId ${groupId}`)
+const getEventContents = (event: any): Record<string, any> => {
+    let flatEvent: Record<string, any> = {}
+
+    // The event field of the Kafka message contains a single key - the java class name of the event (?).
+    // We can't know for sure what that key is so we loop over any values (though there should in reality only
+    // be a single entry)
+    Object.values(event)?.forEach((eventValue) => {
+        if (eventValue instanceof Object) {
+            flatEvent = {
+                ...flatEvent,
+                ...eventValue,
+            }
+        }
+    })
+
+    return flatEvent
+}
+
+const messageHandler = async ({ message }: EachMessagePayload): Promise<void> => {
+    logger.debug(`Got kafka event`)
+
+    if (message.value) {
+        const messageValue = await registry.decode(message.value)
+        const { eventName, event, correlationId } = messageValue
+
+        const eventContents = getEventContents(event)
+        const pos = eventContents.meta?.pos
+
+        if (pos === 'Entur App' || pos === 'Entur Web') {
+            logger.info(
+                `Decoded avro value for ${eventName} (paymentId ${eventContents.paymentId})`,
+                {
+                    correlationId,
+                    paymentId: eventContents.paymentId,
+                    avroValue: messageValue,
+                },
+            )
+
+            // construct a copy of the message value object but without the java-class-name key in the event.
+            const valueWithoutEventName = {
+                ...messageValue,
+                event: eventContents,
+            }
+
+            await publishMessage(valueWithoutEventName, eventName, correlationId)
+        } else {
+            logger.debug(`Decoded avro value for ${eventName}`, {
+                correlationId,
+                avroValue: messageValue,
+            })
+            logger.debug('Did not forward message as it was not for app/web', {
+                correlationId: messageValue.correlationId,
+            })
+        }
+    }
 }
 
 export const proxyToPubSub = async (topic: string): Promise<void> => {
@@ -53,62 +110,10 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
         logger.info(`Trying to subscribe to Kafka topic ${topic}`)
         await consumer.subscribe({ topic })
         logger.info(`Subscribed to Kafka topic ${topic}`)
+
         await consumer.run({
             autoCommit: true,
-            eachMessage: async ({
-                message,
-            }: {
-                topic: string
-                partition: number
-                message: KafkaMessage
-            }) => {
-                logger.debug(`Got kafka event`)
-                if (message.value) {
-                    const value = await registry.decode(message.value)
-                    const { eventName, event, correlationId } = value
-
-                    // In reality only one value should be found - the java class name of the event (?),
-                    // but we can't know for sure what that name is.
-                    let flatEvent: Record<string, any> = {}
-
-                    Object.values(event)?.forEach((eventValue) => {
-                        if (eventValue instanceof Object) {
-                            flatEvent = {
-                                ...flatEvent,
-                                ...eventValue,
-                            }
-                        }
-                    })
-
-                    const pos = flatEvent.meta?.pos
-
-                    if (pos === 'Entur App' || pos === 'Entur Web') {
-                        logger.info(
-                            `Decoded avro value for ${eventName} (paymentId ${flatEvent.paymentId})`,
-                            {
-                                correlationId,
-                                paymentId: flatEvent.paymentId,
-                                avroValue: value,
-                            },
-                        )
-
-                        const valueWithoutEventName = {
-                            ...value,
-                            event: flatEvent,
-                        }
-
-                        await publishMessage(valueWithoutEventName, eventName, correlationId)
-                    } else {
-                        logger.debug(`Decoded avro value for ${eventName}`, {
-                            correlationId,
-                            avroValue: value,
-                        })
-                        logger.debug('Did not forward message as it was not for app/web', {
-                            correlationId: value.correlationId,
-                        })
-                    }
-                }
-            },
+            eachMessage: messageHandler,
         })
     } catch (err) {
         logger.error(`Failed to consume ${topic}`, err)
