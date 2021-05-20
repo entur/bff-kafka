@@ -17,7 +17,7 @@ export async function publishMessage(
             .topic(PUBSUB_TOPIC)
             .publish(dataBuffer, customAttributes)
         logger.info(
-            `Published ${eventName} with id ${messageId} to Pub/Sub topic ${PUBSUB_TOPIC}`,
+            `Published ${eventName} with message id ${messageId} to Pub/Sub topic ${PUBSUB_TOPIC}`,
             { correlationId },
         )
     } catch (error) {

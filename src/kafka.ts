@@ -70,7 +70,8 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
                     // In reality only one value should be found - the java class name of the event (?),
                     // but we can't know for sure what that name is.
                     let flatEvent: Record<string, any> = {}
-                    Object.values(event).forEach((eventValue) => {
+
+                    Object.values(event)?.forEach((eventValue) => {
                         if (eventValue instanceof Object) {
                             flatEvent = {
                                 ...flatEvent,
@@ -82,11 +83,26 @@ export const proxyToPubSub = async (topic: string): Promise<void> => {
                     const pos = flatEvent.meta?.pos
 
                     if (pos === 'Entur App' || pos === 'Entur Web') {
-                        logger.info('Decoded avro value', { correlationId, avroValue: value })
-                        value.event = flatEvent
-                        await publishMessage(value, eventName, correlationId)
+                        logger.info(
+                            `Decoded avro value for ${eventName} (paymentId ${flatEvent.paymentId})`,
+                            {
+                                correlationId,
+                                paymentId: flatEvent.paymentId,
+                                avroValue: value,
+                            },
+                        )
+
+                        const valueWithoutEventName = {
+                            ...value,
+                            event: flatEvent,
+                        }
+
+                        await publishMessage(valueWithoutEventName, eventName, correlationId)
                     } else {
-                        logger.debug('Decoded avro value', { correlationId, avroValue: value })
+                        logger.debug(`Decoded avro value for ${eventName}`, {
+                            correlationId,
+                            avroValue: value,
+                        })
                         logger.debug('Did not forward message as it was not for app/web', {
                             correlationId: value.correlationId,
                         })
