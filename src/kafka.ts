@@ -80,7 +80,7 @@ const messageHandler = async ({ message }: EachMessagePayload): Promise<void> =>
                     correlationId,
                     paymentId: eventContents.paymentId,
                     avroValue: messageValue,
-                    kafkaTimestamp: new Date(parseInt(message.timestamp)),
+                    kafkaTimestamp: new Date(parseInt(message.timestamp)).toISOString(),
                 },
             )
 
