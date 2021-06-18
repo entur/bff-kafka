@@ -4,6 +4,7 @@ import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import { publishMessage } from './pubsub'
 import logger from './logger'
+import { Meta } from './types'
 
 let kafka: Kafka | undefined
 
@@ -63,8 +64,8 @@ const getEventContents = (event: any): Record<string, any> => {
     return flatEvent
 }
 
-const messageHandler = async ({ message }: EachMessagePayload): Promise<void> => {
-    logger.debug(`Got kafka event`)
+const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<void> => {
+    logger.debug(`Got kafka event on topic ${topic}`)
 
     if (message.value) {
         const messageValue = await registry.decode(message.value)
@@ -74,11 +75,21 @@ const messageHandler = async ({ message }: EachMessagePayload): Promise<void> =>
         const pos = eventContents.meta?.pos
 
         if (pos === 'Entur App' || pos === 'Entur Web') {
+            const transactionIdString = eventContents.paymentTransactionId
+                ? `, transId ${eventContents.paymentTransactionId}`
+                : ''
+
+            const meta: Meta = {
+                correlationId,
+            }
+
+            if (eventContents.paymentId) meta.paymentId = eventContents.paymentId
+            if (eventContents.paymentTransactionId) meta.transactionId = eventContents.paymentTransactionId
+
             logger.info(
-                `Decoded avro value for ${eventName} (paymentId ${eventContents.paymentId})`,
+                `Decoded avro value for ${eventName} (paymentId ${eventContents.paymentId}${transactionIdString})`,
                 {
-                    correlationId,
-                    paymentId: eventContents.paymentId,
+                    ...meta,
                     avroValue: messageValue,
                     kafkaTimestamp: new Date(parseInt(message.timestamp)).toISOString(),
                 },
@@ -90,7 +101,7 @@ const messageHandler = async ({ message }: EachMessagePayload): Promise<void> =>
                 event: eventContents,
             }
 
-            await publishMessage(valueWithoutEventName, eventName, correlationId)
+            await publishMessage(valueWithoutEventName, eventName, meta)
         } else {
             logger.debug(`Decoded avro value for ${eventName}`, {
                 correlationId,

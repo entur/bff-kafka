@@ -1,13 +1,14 @@
 import { PubSub } from '@google-cloud/pubsub'
 import logger from './logger'
 import { PUBSUB_TOPIC } from './config'
+import { Meta } from './types'
 
 const pubSubClient = new PubSub()
 
 export async function publishMessage(
     data: Record<string, unknown>,
     eventName: string,
-    correlationId: string,
+    meta: Meta,
 ): Promise<void> {
     const dataBuffer = Buffer.from(JSON.stringify(data))
     const customAttributes = { eventName }
@@ -18,10 +19,10 @@ export async function publishMessage(
             .publish(dataBuffer, customAttributes)
         logger.info(
             `Published ${eventName} with message id ${messageId} to Pub/Sub topic ${PUBSUB_TOPIC}`,
-            { correlationId },
+            meta,
         )
     } catch (error) {
-        logger.error(`Received error while publishing: ${error.message}`, { correlationId })
+        logger.error(`Received error while publishing: ${error.message}`, meta)
         throw error
     }
 }
