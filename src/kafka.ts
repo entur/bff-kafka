@@ -74,7 +74,7 @@ const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<v
         const eventContents = getEventContents(event)
         const pos = eventContents.meta?.pos
 
-        if (pos === 'Entur App' || pos === 'Entur Web') {
+        if (pos === 'Entur App' || pos === 'Entur Web' || pos === 'sales-process-manager-client') {
             const transactionIdString = eventContents.paymentTransactionId
                 ? `, transId ${eventContents.paymentTransactionId}`
                 : ''
@@ -83,8 +83,12 @@ const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<v
                 correlationId,
             }
 
-            if (eventContents.paymentId) meta.paymentId = eventContents.paymentId
-            if (eventContents.paymentTransactionId) meta.transactionId = eventContents.paymentTransactionId
+            if (eventContents.paymentId) {
+                meta.paymentId = eventContents.paymentId
+            }
+            if (eventContents.paymentTransactionId) {
+                meta.transactionId = eventContents.paymentTransactionId
+            }
 
             logger.info(
                 `Decoded avro value for ${eventName} (paymentId ${eventContents.paymentId}${transactionIdString})`,
