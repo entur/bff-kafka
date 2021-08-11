@@ -14,9 +14,12 @@ Node.js version >= 12 is required, so make sure you have that installed.
 npm install
 ```
 
+See bottom of document for what you need to do in the Google Cloud Platform GUI for a new
+environment.
+
 ## 🛠 Configure
 
-See .env.prod/staging/dev for configuration.
+See .env.prod/staging/dev/beta for configuration.
 
 KAFKA_TOPICS is a comma separated list of topics to subscribe to.
 
@@ -31,6 +34,7 @@ Run `npm run <env>` to run the server locally.
 npm run dev
 npm run staging
 npm run prod
+npm run beta
 ```
 
 The default port is **9000**. You can override it with the `PORT` environment variable.
@@ -54,6 +58,7 @@ npm run deploy // dev is the default
 npm run deploy dev
 npm run deploy staging
 npm run deploy prod
+npm run deploy beta
 ```
 
 This will deploy the app to **gcloud**.

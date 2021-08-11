@@ -5,3 +5,6 @@ export const KAFKA_SCHEMA_REGISTRY: string
 
 export const KAFKA_TOPICS: string
 export const PUBSUB_TOPIC: string
+
+export const ENTUR_POS_NATIVE: string
+export const ENTUR_POS_WEB: string

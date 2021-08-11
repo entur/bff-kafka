@@ -1,7 +1,13 @@
 import { getSecret } from './secrets'
 import { Consumer, EachMessagePayload, Kafka } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
-import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
+import {
+    ENTUR_POS_NATIVE,
+    ENTUR_POS_WEB,
+    ENVIRONMENT,
+    KAFKA_BROKER,
+    KAFKA_SCHEMA_REGISTRY,
+} from './config'
 import { publishMessage } from './pubsub'
 import logger from './logger'
 import { Meta } from './types'
@@ -74,7 +80,11 @@ const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<v
         const eventContents = getEventContents(event)
         const pos = eventContents.meta?.pos
 
-        if (pos === 'Entur App' || pos === 'Entur Web' || pos === 'sales-process-manager-client') {
+        if (
+            pos === ENTUR_POS_NATIVE ||
+            pos === ENTUR_POS_WEB ||
+            pos === 'sales-process-manager-client'
+        ) {
             const transactionIdString = eventContents.paymentTransactionId
                 ? `, transId ${eventContents.paymentTransactionId}`
                 : ''
