@@ -1,28 +1,35 @@
 import { PubSub } from '@google-cloud/pubsub'
 import logger from './logger'
-import { PUBSUB_TOPIC } from './config'
-import { Meta } from './types'
 
 const pubSubClient = new PubSub()
 
+const getPubsubTopic = (kafkaTopic: string): string => {
+    if (
+        kafkaTopic.endsWith('-production') ||
+        kafkaTopic.endsWith('-staging') ||
+        kafkaTopic.endsWith('-dev')
+    ) {
+        return kafkaTopic.substr(0, kafkaTopic.lastIndexOf('-'))
+    }
+    return kafkaTopic
+}
+
 export async function publishMessage(
-    data: Record<string, unknown>,
+    kafkaTopic: string,
     eventName: string,
-    meta: Meta,
+    data: Record<string, unknown>,
+    correlationId: string,
 ): Promise<void> {
     const dataBuffer = Buffer.from(JSON.stringify(data))
-    const customAttributes = { eventName }
-
+    const topic = `bff-kafka-${getPubsubTopic(kafkaTopic)}`
     try {
-        const messageId = await pubSubClient
-            .topic(PUBSUB_TOPIC)
-            .publish(dataBuffer, customAttributes)
+        const messageId = await pubSubClient.topic(topic).publish(dataBuffer, { eventName })
         logger.info(
-            `Published ${eventName} with message id ${messageId} to Pub/Sub topic ${PUBSUB_TOPIC}`,
-            meta,
+            `Published ${eventName} with message id ${messageId} to Pub/Sub topic ${topic}`,
+            { correlationId, eventName, topic },
         )
     } catch (error) {
-        logger.error(`Received error while publishing: ${error.message}`, meta)
+        logger.error(`Received error while publishing: ${error}`, { correlationId })
         throw error
     }
 }

@@ -10,9 +10,15 @@ import {
 } from './config'
 import { publishMessage } from './pubsub'
 import logger from './logger'
-import { Meta } from './types'
+import eventsWhitelist from './eventsWhitelist'
 
 let kafka: Kafka | undefined
+
+type EventContents = Record<string, any>
+
+// having a local part of the id lets us run against other environments
+// from localhost without interfering with the real bff-kafka instances
+const localId = process.env.NODE_ENV === 'production' ? '' : '-local'
 
 const getKafka = async (): Promise<Kafka> => {
     if (!kafka) {
@@ -22,7 +28,7 @@ const getKafka = async (): Promise<Kafka> => {
         ])
 
         const broker = KAFKA_BROKER || ''
-        const clientId = `bff-kafka-client-${ENVIRONMENT}`
+        const clientId = `bff-kafka-client-${ENVIRONMENT}${localId}`
         kafka = new Kafka({
             clientId,
             brokers: [broker],
@@ -39,7 +45,7 @@ const getKafka = async (): Promise<Kafka> => {
 }
 
 export const connectToKafka = async (): Promise<void> => {
-    const groupId = `bff-kafka-${ENVIRONMENT}`
+    const groupId = `bff-kafka-${ENVIRONMENT}${localId}`
     consumer = (await getKafka()).consumer({ groupId })
     logger.info(`Registered consumer with groupId ${groupId}`)
 }
@@ -52,8 +58,8 @@ const registry = new SchemaRegistry({
 
 let consumer: Consumer | undefined
 
-const getEventContents = (event: any): Record<string, any> => {
-    let flatEvent: Record<string, any> = {}
+const getEventContents = (event: any): EventContents => {
+    let flatEvent: EventContents = {}
 
     // The event field of the Kafka message contains a single key - the java class name of the event (?).
     // We can't know for sure what that key is so we loop over any values (though there should in reality only
@@ -70,60 +76,68 @@ const getEventContents = (event: any): Record<string, any> => {
     return flatEvent
 }
 
-const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<void> => {
-    logger.debug(`Got kafka event on topic ${topic}`)
+const isForSelfService = (eventContents: any): boolean => {
+    const pos = eventContents.meta?.pos
 
+    return (
+        pos === ENTUR_POS_NATIVE || pos === ENTUR_POS_WEB || pos === 'sales-process-manager-client'
+    )
+}
+
+const handleEvent = async (topic: string, message: any, messageValue: any): Promise<void> => {
+    const { eventName, event, correlationId } = messageValue
+
+    const eventContents = getEventContents(event)
+
+    logger.info(`Decoded avro value for ${eventName}`, {
+        ...eventContents,
+        correlationId,
+        avroValue: messageValue,
+        kafkaTimestamp: new Date(parseInt(message.timestamp)).toISOString(),
+    })
+
+    // construct a copy of the message value object but without the java-class-name key in the event.
+    const eventData = {
+        ...messageValue,
+        event: eventContents,
+    }
+
+    await publishMessage(topic, eventName, eventData, correlationId)
+}
+
+const handlePaymentEvent = async (
+    topic: string,
+    message: any,
+    messageValue: any,
+): Promise<void> => {
+    const { eventName, event, correlationId } = messageValue
+    const eventContents = getEventContents(event)
+
+    if (isForSelfService(eventContents)) {
+        await handleEvent(topic, message, messageValue)
+    } else {
+        logger.debug('Did not forward message as it was not for app/web', {
+            eventName,
+            correlationId,
+            avroValue: messageValue,
+        })
+    }
+}
+
+const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<void> => {
     if (message.value) {
         const messageValue = await registry.decode(message.value)
-        const { eventName, event, correlationId } = messageValue
+        const { eventName } = messageValue
 
-        const eventContents = getEventContents(event)
-        const pos = eventContents.meta?.pos
+        if (!eventsWhitelist.includes(eventName)) {
+            return
+        }
 
-        if (
-            pos === ENTUR_POS_NATIVE ||
-            pos === ENTUR_POS_WEB ||
-            pos === 'sales-process-manager-client'
-        ) {
-            const transactionIdString = eventContents.paymentTransactionId
-                ? `, transId ${eventContents.paymentTransactionId}`
-                : ''
-
-            const meta: Meta = {
-                correlationId,
-            }
-
-            if (eventContents.paymentId) {
-                meta.paymentId = eventContents.paymentId
-            }
-            if (eventContents.paymentTransactionId) {
-                meta.transactionId = eventContents.paymentTransactionId
-            }
-
-            logger.info(
-                `Decoded avro value for ${eventName} (paymentId ${eventContents.paymentId}${transactionIdString})`,
-                {
-                    ...meta,
-                    avroValue: messageValue,
-                    kafkaTimestamp: new Date(parseInt(message.timestamp)).toISOString(),
-                },
-            )
-
-            // construct a copy of the message value object but without the java-class-name key in the event.
-            const valueWithoutEventName = {
-                ...messageValue,
-                event: eventContents,
-            }
-
-            await publishMessage(valueWithoutEventName, eventName, meta)
+        logger.debug(`Got kafka event on topic ${topic}`)
+        if (topic.startsWith('payment-events')) {
+            await handlePaymentEvent(topic, message, messageValue)
         } else {
-            logger.debug(`Decoded avro value for ${eventName}`, {
-                correlationId,
-                avroValue: messageValue,
-            })
-            logger.debug('Did not forward message as it was not for app/web', {
-                correlationId: messageValue.correlationId,
-            })
+            await handleEvent(topic, message, messageValue)
         }
     }
 }
