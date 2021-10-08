@@ -1,9 +1,10 @@
 import { PubSub } from '@google-cloud/pubsub'
 import logger from './logger'
+import { PubsubMessage } from './types'
 
 const pubSubClient = new PubSub()
 
-const getPubsubTopic = (kafkaTopic: string): string => {
+const getKafkaTopicWithoutEnv = (kafkaTopic: string): string => {
     if (
         kafkaTopic.endsWith('-production') ||
         kafkaTopic.endsWith('-staging') ||
@@ -14,16 +15,12 @@ const getPubsubTopic = (kafkaTopic: string): string => {
     return kafkaTopic
 }
 
-export async function publishMessage(
-    kafkaTopic: string,
-    eventName: string,
-    data: Record<string, unknown>,
-    correlationId: string,
-): Promise<void> {
-    const dataBuffer = Buffer.from(JSON.stringify(data))
-    const topic = `bff-kafka-${getPubsubTopic(kafkaTopic)}`
+export async function publishMessage(kafkaTopic: string, message: PubsubMessage): Promise<void> {
+    const { eventName, correlationId } = message
+    const data = Buffer.from(JSON.stringify(message))
+    const topic = `bff-kafka-${getKafkaTopicWithoutEnv(kafkaTopic)}`
     try {
-        const messageId = await pubSubClient.topic(topic).publish(dataBuffer, { eventName })
+        const messageId = await pubSubClient.topic(topic).publish(data, { eventName })
         logger.info(
             `Published ${eventName} with message id ${messageId} to Pub/Sub topic ${topic}`,
             { correlationId, eventName, topic },

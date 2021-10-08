@@ -14,15 +14,10 @@ http()
 
 connectToKafka()
     .then(() => {
-        KAFKA_TOPICS.split(',')
-            .map((topic) => topic.trim())
-            .forEach((topic) => {
-                proxyToPubSub(topic)
-                    .then(() => logger.info(`Consumer listening to ${topic}.`))
-                    .catch((reason) =>
-                        logger.error('Kafka failed, giving you up. Sorry, Rick Astley. ', reason),
-                    )
-            })
+        const topics = KAFKA_TOPICS.split(',').map((topic) => topic.trim())
+        proxyToPubSub(topics)
+            .then(() => logger.info(`The consumer is listening.`))
+            .catch((reason) => logger.error('Kafka failed.', reason))
     })
     .catch((reason) => {
         logger.error('Could not connect to Kafka. ', reason)
