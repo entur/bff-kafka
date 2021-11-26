@@ -5,15 +5,13 @@
     "description": "A backend that handles Entur Kafka integration for Entur clients.",
     "author": "Entur AS",
     "engines": {
-        "node": ">=12",
-        "yarn": ">=1.12"
+        "node": "14",
+        "npm": "8"
     },
     "scripts": {
         "start": "node dist/server.js",
         "test": "jest",
-        "format": "prettier . --write",
-        "format:check": "prettier . --check",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx && npm run format:check",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
         "debug": "./scripts/debug.sh",
         "dev": "npm run debug dev",
         "staging": "npm run debug staging",
