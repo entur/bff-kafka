@@ -1,53 +1,55 @@
 {
-  "name": "@entur/bff-kafka",
-  "version": "0.0.1",
-  "private": true,
-  "description": "A backend that handles Entur Kafka integration for Entur clients.",
-  "author": "Entur AS",
-  "engines": {
-    "node": ">=12",
-    "yarn": ">=1.12"
-  },
-  "scripts": {
-    "start": "node dist/server.js",
-    "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "debug": "./scripts/debug.sh",
-    "dev": "npm run debug dev",
-    "staging": "npm run debug staging",
-    "prod": "npm run debug prod",
-    "build:dev": "tsc && npm run populate-env-vars dev",
-    "build:staging": "tsc && npm run populate-env-vars staging",
-    "build:prod": "tsc && npm run populate-env-vars prod",
-    "build:beta": "tsc && npm run populate-env-vars beta",
-    "deploy": "./scripts/deploy.sh",
-    "transpile": "tsc",
-    "populate-env-vars": "ts-node ./scripts/environment.ts"
-  },
-  "dependencies": {
-    "@google-cloud/logging-winston": "^4.0.1",
-    "@google-cloud/pubsub": "^2.11.0",
-    "@google-cloud/secret-manager": "^3.6.0",
-    "@google-cloud/trace-agent": "^5.1.1",
-    "@kafkajs/confluent-schema-registry": "^2.0.1",
-    "kafkajs": "^1.15.0",
-    "winston": "^3.3.3"
-  },
-  "devDependencies": {
-    "@types/jest": "^25.2.3",
-    "@types/node": "^12.19.8",
-    "@typescript-eslint/eslint-plugin": "^3.10.1",
-    "@typescript-eslint/parser": "^3.10.1",
-    "eslint": "^7.14.0",
-    "eslint-loader": "^4.0.2",
-    "eslint-plugin-fp": "^2.3.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "jest": "^25.5.4",
-    "nodemon": "^2.0.6",
-    "prettier": "^2.2.0",
-    "ts-jest": "^25.5.1",
-    "ts-node": "^8.10.2",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.9.7"
-  }
+    "name": "@entur/bff-kafka",
+    "version": "0.0.1",
+    "private": true,
+    "description": "A backend that handles Entur Kafka integration for Entur clients.",
+    "author": "Entur AS",
+    "engines": {
+        "node": ">=12",
+        "yarn": ">=1.12"
+    },
+    "scripts": {
+        "start": "node dist/server.js",
+        "test": "jest",
+        "format": "prettier . --write",
+        "format:check": "prettier . --check",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx && npm run format:check",
+        "debug": "./scripts/debug.sh",
+        "dev": "npm run debug dev",
+        "staging": "npm run debug staging",
+        "prod": "npm run debug prod",
+        "build:dev": "tsc && npm run populate-env-vars dev",
+        "build:staging": "tsc && npm run populate-env-vars staging",
+        "build:prod": "tsc && npm run populate-env-vars prod",
+        "build:beta": "tsc && npm run populate-env-vars beta",
+        "deploy": "./scripts/deploy.sh",
+        "transpile": "tsc",
+        "populate-env-vars": "ts-node ./scripts/environment.ts"
+    },
+    "dependencies": {
+        "@google-cloud/logging-winston": "^4.0.1",
+        "@google-cloud/pubsub": "^2.11.0",
+        "@google-cloud/secret-manager": "^3.6.0",
+        "@google-cloud/trace-agent": "^5.1.1",
+        "@kafkajs/confluent-schema-registry": "^2.0.1",
+        "kafkajs": "^1.15.0",
+        "winston": "^3.3.3"
+    },
+    "devDependencies": {
+        "@types/jest": "^25.2.3",
+        "@types/node": "^12.19.8",
+        "@typescript-eslint/eslint-plugin": "^3.10.1",
+        "@typescript-eslint/parser": "^3.10.1",
+        "eslint": "^7.14.0",
+        "eslint-loader": "^4.0.2",
+        "eslint-plugin-fp": "^2.3.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "jest": "^25.5.4",
+        "nodemon": "^2.0.6",
+        "prettier": "^2.2.0",
+        "ts-jest": "^25.5.1",
+        "ts-node": "^8.10.2",
+        "tslint-eslint-rules": "^5.4.0",
+        "typescript": "^3.9.7"
+    }
 }
