@@ -21,7 +21,7 @@ const handleTicketDistributionGroupEvent = async (
     const eventContents = messageValue[eventContentsKey]
 
     logger.info(`Decoded avro value for ${eventName}`, {
-        ...eventContents,
+        eventContents,
         correlationId,
         avroValue: messageValue,
         kafkaTimestamp: new Date(parseInt(message.timestamp)).toISOString(),
