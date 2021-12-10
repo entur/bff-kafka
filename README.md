@@ -8,7 +8,7 @@ A backend service listening to Kafka messages
 
 ## 📦 Install
 
-Node.js version >= 12 is required, so make sure you have that installed.
+Node.js version >= 14 is required, so make sure you have that installed.
 
 ```
 npm install
