@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid'
+
 import logger from '../logger'
 import { publishMessage } from '../pubsub'
 
@@ -19,7 +21,7 @@ async function handleCustomerChangedEvent(
 ): Promise<void> {
     const { changeEvent, timestamp, processorOrganisation } = messageValue
 
-    const correlationId: string | undefined = message.headers?.['X-Correlation-Id']?.toString()
+    const correlationId: string = message.headers?.['X-Correlation-Id']?.toString() || uuid()
 
     if (processorOrganisation !== 1) {
         logger.debug('Did not forward message as it was not processed by the Entur organization', {
