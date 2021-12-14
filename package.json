@@ -21,6 +21,7 @@
         "build:prod": "tsc && npm run populate-env-vars prod",
         "build:beta": "tsc && npm run populate-env-vars beta",
         "deploy": "./scripts/deploy.sh",
+        "ts": "tsc --noEmit",
         "transpile": "tsc",
         "populate-env-vars": "ts-node ./scripts/environment.ts"
     },

@@ -17,7 +17,7 @@ jobs:
               run: npm ci
 
             - name: TypeScript check
-              run: npm run transpile -- --noEmit
+              run: npm run ts
 
             - name: Lint
               run: npm run lint
