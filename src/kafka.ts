@@ -3,6 +3,8 @@ import { Consumer, EachMessagePayload, Kafka } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import logger from './logger'
+
+import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler'
 import handlePaymentEvent from './eventHandlers/paymentEventHandler'
 import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler'
 import handleTicketDistributionEvent from './eventHandlers/ticketDistributionEventHandler'
@@ -54,15 +56,19 @@ let consumer: Consumer | undefined
 const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<void> => {
     logger.debug(`Got kafka event on topic ${topic}`)
 
-    if (message.value) {
-        const messageValue = await registry.decode(message.value)
-        if (topic.startsWith('payment-events')) {
-            await handlePaymentEvent(topic, message, messageValue)
-        } else if (topic.startsWith('ticket-distribution-group-events')) {
-            await handleTicketDistributionGroupEvent(topic, message, messageValue)
-        } else if (topic.startsWith('ticket-distribution-events')) {
-            await handleTicketDistributionEvent(topic, message, messageValue)
-        }
+    if (!message.value) {
+        return
+    }
+
+    const messageValue = await registry.decode(message.value)
+    if (topic.startsWith('payment-events')) {
+        await handlePaymentEvent(topic, message, messageValue)
+    } else if (topic.startsWith('ticket-distribution-group-events')) {
+        await handleTicketDistributionGroupEvent(topic, message, messageValue)
+    } else if (topic.startsWith('ticket-distribution-events')) {
+        await handleTicketDistributionEvent(topic, message, messageValue)
+    } else if (topic.startsWith('customer-changed')) {
+        await handleCustomerChangedEvent(topic, message, messageValue)
     }
 }
 
