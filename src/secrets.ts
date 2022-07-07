@@ -1,11 +1,12 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 import logger from './logger'
-import { ENVIRONMENT } from './config'
+import { getProjectId } from './utils/project'
 
 const client = new SecretManagerServiceClient()
 
 export async function getSecret(key: 'kafka-user' | 'kafka-password'): Promise<string> {
-    const secretsPath = `projects/entur-${ENVIRONMENT}/secrets/${key}/versions/latest`
+    const projectId = getProjectId()
+    const secretsPath = `projects/${projectId}/secrets/${key}/versions/latest`
     let version
     try {
         const [secretVersion] = await client.accessSecretVersion({
