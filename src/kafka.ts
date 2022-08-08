@@ -23,7 +23,7 @@ const getKafka = async (): Promise<Kafka> => {
         ])
 
         const broker = KAFKA_BROKER || ''
-        const clientId = `bff-kafka-client-${ENVIRONMENT}${localId}`
+        const clientId = `bff-kafka-client-${ENVIRONMENT}${localId}` // unique pr client
         kafka = new Kafka({
             clientId,
             brokers: [broker],
@@ -40,6 +40,8 @@ const getKafka = async (): Promise<Kafka> => {
 }
 
 export const connectToKafka = async (): Promise<void> => {
+    // kafka works as a message queue if multiple consumers share group id, meaning only one consumer will
+    // get a messsage. To prevent local runs interfering with production we add a localId.
     const groupId = `bff-kafka-${ENVIRONMENT}${localId}`
     consumer = (await getKafka()).consumer({ groupId })
     logger.info(`Registered consumer with groupId ${groupId}`)
