@@ -8,6 +8,7 @@ import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHand
 import handlePaymentEvent from './eventHandlers/paymentEventHandler'
 import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler'
 import handleTicketDistributionEvent from './eventHandlers/ticketDistributionEventHandler'
+import handleAllTicketDistributionGroupsForOrderVersionCompletedEvent from './eventHandlers/allTicketDistributionGroupsForOrderVersionCompletedEventHandler'
 
 let kafka: Kafka | undefined
 
@@ -65,6 +66,14 @@ const messageHandler = async ({ message, topic }: EachMessagePayload): Promise<v
         await handlePaymentEvent(topic, message, messageValue)
     } else if (topic.startsWith('ticket-distribution-group-events')) {
         await handleTicketDistributionGroupEvent(topic, message, messageValue)
+    } else if (
+        topic.startsWith('all-ticket-distribution-groups-for-order-version-completed-events')
+    ) {
+        await handleAllTicketDistributionGroupsForOrderVersionCompletedEvent(
+            topic,
+            message,
+            messageValue,
+        )
     } else if (topic.startsWith('ticket-distribution-events')) {
         await handleTicketDistributionEvent(topic, message, messageValue)
     } else if (topic.startsWith('customer-changed')) {
