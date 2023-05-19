@@ -1,6 +1,6 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
-import logger from './logger'
-import { getProjectId } from './utils/project'
+import logger from './logger.js'
+import { getProjectId } from './utils/project.js'
 
 const client = new SecretManagerServiceClient()
 

@@ -1,6 +1,6 @@
 import { PubSub } from '@google-cloud/pubsub'
-import logger from './logger'
-import { PubsubMessage } from './types'
+import logger from './logger.js'
+import { PubsubMessage } from './types.js'
 
 const pubSubClient = new PubSub()
 

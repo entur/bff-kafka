@@ -1,9 +1,9 @@
-import logger from '../logger'
-import eventsWhitelist from '../eventsWhitelist'
-import { publishMessage } from '../pubsub'
+import logger from '../logger.js'
+import eventsWhitelist from '../eventsWhitelist.js'
+import { publishMessage } from '../pubsub.js'
 
 const getEventContentsKey = (messageValue: any, type: string): string => {
-    return `${type[0].toLowerCase()}${type.slice(1)}`
+    return `${type[0]?.toLowerCase()}${type.slice(1)}`
 }
 
 const handleTicketDistributionGroupEvent = async (

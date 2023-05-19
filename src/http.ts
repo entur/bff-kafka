@@ -1,5 +1,5 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
-import logger from './logger'
+import logger from './logger.js'
 
 // Minimal HTTP server that accepts any calls, used for keepalive, to prevent idle timeouts.
 const httpServer = http.createServer((request: IncomingMessage, response: ServerResponse) => {
