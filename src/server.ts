@@ -13,9 +13,9 @@ logger.info(`Starting kafka to pub sub bridge, env is ${ENVIRONMENT}.`)
 http()
 
 connectToKafka()
-    .then(() => {
+    .then(({ consumer, registry }) => {
         const topics = KAFKA_TOPICS.split(',').map((topic) => topic.trim())
-        proxyToPubSub(topics)
+        proxyToPubSub(consumer, registry, topics)
             .then(() => logger.info(`The consumer is listening.`))
             .catch((reason) => logger.error('Kafka failed.', reason))
     })

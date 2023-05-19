@@ -4,7 +4,7 @@ import { getProjectId } from './utils/project'
 
 const client = new SecretManagerServiceClient()
 
-export async function getSecret(key: 'kafka-user' | 'kafka-password'): Promise<string> {
+export async function getSecret(key: 'kafka-user-aiven' | 'kafka-password-aiven'): Promise<string> {
     const projectId = getProjectId()
     const secretsPath = `projects/${projectId}/secrets/${key}/versions/latest`
     let version
