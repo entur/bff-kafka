@@ -1,8 +1,10 @@
 import { getSecret } from './secrets'
-import { Consumer, EachMessagePayload, Kafka } from 'kafkajs'
+import { Consumer, EachMessagePayload, Kafka, CompressionTypes, CompressionCodecs } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import logger from './logger'
+
+import LZ4Codec from 'kafkajs-lz4'
 
 import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler'
 import handlePaymentEvent from './eventHandlers/paymentEventHandler'
@@ -10,6 +12,7 @@ import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributi
 import handleTicketDistributionEvent from './eventHandlers/ticketDistributionEventHandler'
 
 let kafka: Kafka | undefined
+CompressionCodecs[CompressionTypes.LZ4] = new LZ4Codec().codec
 
 // having a local part of the id lets us run against other environments
 // from localhost without interfering with the real bff-kafka instances
