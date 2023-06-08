@@ -21,7 +21,7 @@ const loggingWinston = new LoggingWinston({
 const transportsDev = [new winston.transports.Console()]
 const transportsProd = [loggingWinston]
 
-const transports = process.env.NODE_ENV === 'production' ? transportsProd : transportsDev
+export const transports = process.env.NODE_ENV === 'production' ? transportsProd : transportsDev
 
 const logger = winston.createLogger({
     level: 'debug',
