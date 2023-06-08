@@ -1,6 +1,11 @@
-import { getSecret } from './secrets'
-import { Consumer, EachMessagePayload, Kafka } from 'kafkajs'
+// types for Snappy are missing, but we don't need them
+// @ts-ignore
+import SnappyCodec from 'kafkajs-snappy'
+import LZ4Codec from 'kafkajs-lz4'
+import { Consumer, EachMessagePayload, Kafka, CompressionTypes, CompressionCodecs } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
+
+import { getSecret } from './secrets'
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
 import logger from './logger'
 
@@ -9,6 +14,13 @@ import handlePaymentEvent from './eventHandlers/paymentEventHandler'
 import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler'
 
 let kafka: Kafka | undefined
+
+// Kafkajs supports Gzip compression by default. LZ4-support is needed because
+// some of the producers suddenly started publishing LZ4-compressed messages.
+// Snappy is included because it seems fairly popular and we want to prevent a
+// future crash like the one we got from LZ4.
+CompressionCodecs[CompressionTypes.LZ4] = new LZ4Codec().codec
+CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 
 // having a local part of the id lets us run against other environments
 // from localhost without interfering with the real bff-kafka instances
