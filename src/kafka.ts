@@ -2,23 +2,30 @@
 // @ts-ignore
 import SnappyCodec from 'kafkajs-snappy'
 import LZ4Codec from 'kafkajs-lz4'
-import { Consumer, EachMessagePayload, Kafka, CompressionTypes, CompressionCodecs } from 'kafkajs'
+import kafkajs from 'kafkajs'
+import type kafkaJsTypes from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 
-import { getSecret } from './secrets'
-import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config'
-import logger from './logger'
+import { getSecret } from './secrets.js'
+import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config.js'
+import logger from './logger.js'
 
-import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler'
-import handlePaymentEvent from './eventHandlers/paymentEventHandler'
-import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler'
+import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler.js'
+import handlePaymentEvent from './eventHandlers/paymentEventHandler.js'
+import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler.js'
 
-import { WinstonLogCreator } from './kafkajsWinstonLogger'
+import { WinstonLogCreator } from './kafkajsWinstonLogger.js'
+
+const { Kafka, CompressionTypes, CompressionCodecs } = kafkajs
+type KafkaType = kafkaJsTypes.Kafka
+type EachMessagePayload = kafkaJsTypes.EachMessagePayload
+type Consumer = kafkaJsTypes.Consumer
 
 // Kafkajs supports Gzip compression by default. LZ4-support is needed because
 // some of the producers suddenly started publishing LZ4-compressed messages.
-// Snappy is included because it seems fairly popular and we want to prevent a
+// Snappy is included because it seems fairly popular, and we want to prevent a
 // future crash like the one we got from LZ4.
+// @ts-ignore // TODO: type issues here
 CompressionCodecs[CompressionTypes.LZ4] = new LZ4Codec().codec
 CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 
@@ -46,7 +53,7 @@ export const connectToKafka = async (): Promise<{
     return { consumer, registry }
 }
 
-const getKafka = async (username: string, password: string): Promise<Kafka> => {
+const getKafka = async (username: string, password: string): Promise<KafkaType> => {
     const broker = KAFKA_BROKER || ''
     const clientId = `bff-kafka-client-${ENVIRONMENT}${localId}` // unique pr client
     const kafka = new Kafka({
