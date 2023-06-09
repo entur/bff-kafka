@@ -12,7 +12,7 @@ import logger from './logger'
 import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler'
 import handlePaymentEvent from './eventHandlers/paymentEventHandler'
 import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler'
-
+import { WinstonLogCreator } from './kafkajsWinstonLogger'
 let kafka: Kafka | undefined
 
 // Kafkajs supports Gzip compression by default. LZ4-support is needed because
@@ -36,6 +36,7 @@ const getKafka = async (): Promise<Kafka> => {
         const broker = KAFKA_BROKER || ''
         const clientId = `bff-kafka-client-${ENVIRONMENT}${localId}` // unique pr client
         kafka = new Kafka({
+            logCreator: WinstonLogCreator,
             clientId,
             brokers: [broker],
             ssl: true,
