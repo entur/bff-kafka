@@ -4,6 +4,7 @@
     "private": true,
     "description": "A backend that handles Entur Kafka integration for Entur clients.",
     "author": "Entur AS",
+    "type": "module",
     "engines": {
         "node": "16",
         "npm": "8"
@@ -24,7 +25,7 @@
         "deploy": "./scripts/deploy.sh",
         "ts": "tsc --noEmit",
         "transpile": "tsc",
-        "populate-env-vars": "ts-node ./scripts/environment.ts"
+        "populate-env-vars": "node --loader ts-node/esm/transpile-only ./scripts/environment.ts"
     },
     "dependencies": {
         "@google-cloud/logging-winston": "^4.0.1",
@@ -39,7 +40,7 @@
         "winston": "^3.3.3"
     },
     "devDependencies": {
-        "@types/jest": "^27.0.3",
+        "@tsconfig/node16": "^1.0.4",
         "@types/node": "^16.11.25",
         "@types/uuid": "^8.3.3",
         "@typescript-eslint/eslint-plugin": "^5.6.0",
@@ -50,8 +51,7 @@
         "jest": "^27.4.4",
         "nodemon": "^2.0.6",
         "prettier": "^2.2.0",
-        "ts-jest": "^27.1.1",
         "ts-node": "^10.4.0",
-        "typescript": "^4.5.3"
+        "typescript": "^5.0.4"
     }
 }

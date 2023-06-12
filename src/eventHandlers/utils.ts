@@ -1,4 +1,4 @@
-import { EventContents } from '../types'
+import { EventContents } from '../types.js'
 
 export const removeEventNameLevelFromEvent = (event: any): EventContents => {
     // The event field of the Kafka message contains a single key - the java class name of the event (?).

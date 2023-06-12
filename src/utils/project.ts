@@ -1,4 +1,4 @@
-import { ENVIRONMENT } from '../config'
+import { ENVIRONMENT } from '../config.js'
 
 export const getProjectId = (): string => {
     if (ENVIRONMENT === 'nordic-dev') {

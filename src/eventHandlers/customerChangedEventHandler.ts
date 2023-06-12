@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid'
 
-import logger from '../logger'
-import { publishMessage } from '../pubsub'
+import logger from '../logger.js'
+import { publishMessage } from '../pubsub.js'
 
 interface CustomerChangedEvent {
     changeEvent: 'CREATE' | 'UPDATE' | 'DELETE'

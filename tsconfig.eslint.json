@@ -2,5 +2,6 @@
     "compilerOptions": {
         "strict": true
     },
-    "include": [".eslintrc.js", "./*.js", "./src/**/*.ts", "./scripts/**/*.ts"]
+    "include": [
+      ".eslintrc.cjs", "./*.js", "./src/**/*.ts", "./scripts/**/*.ts"]
 }

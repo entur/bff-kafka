@@ -1,6 +1,6 @@
 import { logCreator, LogEntry, logLevel } from 'kafkajs'
 import winston from 'winston'
-import { transports } from './logger'
+import { transports } from './logger.js'
 
 const mapKafkajsLogLevelToWinstonLogLevel = (level: logLevel): string => {
     switch (level) {

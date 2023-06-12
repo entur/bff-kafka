@@ -1,8 +1,8 @@
-import logger from '../logger'
-import { publishMessage } from '../pubsub'
-import { ENTUR_POS_NATIVE, ENTUR_POS_WEB } from '../config'
-import eventsWhitelist from '../eventsWhitelist'
-import { removeEventNameLevelFromEvent } from './utils'
+import logger from '../logger.js'
+import { publishMessage } from '../pubsub.js'
+import { ENTUR_POS_NATIVE, ENTUR_POS_WEB } from '../config.js'
+import eventsWhitelist from '../eventsWhitelist.js'
+import { removeEventNameLevelFromEvent } from './utils.js'
 
 const isForSelfService = (eventContents: any): boolean => {
     const pos = eventContents.meta?.pos
