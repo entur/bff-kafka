@@ -6,7 +6,7 @@ cron:
       schedule: every 5 mins
       target: bff-kafka
 
-    - description: "Doctor, do you feel a heartbeat?"
+    - description: "Can you feel a heartbeat, Doctor? No, he's dead, Jim."
       # The url triggers a check of last heartbeat to see if we are up.
       url: /bff-kafka/heartbeat
       schedule: every 1 mins
