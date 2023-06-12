@@ -1,31 +1,30 @@
 // types for Snappy are missing, but we don't need them
 // @ts-ignore
 import SnappyCodec from 'kafkajs-snappy'
-import LZ4Codec from 'kafkajs-lz4'
-import kafkajs from 'kafkajs'
-import type kafkaJsTypes from 'kafkajs'
+import kafkaJsLZ4 from 'kafkajs-lz4'
+import { Kafka, CompressionTypes, CompressionCodecs } from 'kafkajs'
+import type { EachMessagePayload, Consumer } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 
-import { getSecret } from './secrets.js'
-import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config.js'
-import logger from './logger.js'
-
+import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler.js'
 import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler.js'
 import handlePaymentEvent from './eventHandlers/paymentEventHandler.js'
-import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler.js'
 
+import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config.js'
 import { WinstonLogCreator } from './kafkajsWinstonLogger.js'
+import { getSecret } from './secrets.js'
+import logger from './logger.js'
 
-const { Kafka, CompressionTypes, CompressionCodecs } = kafkajs
-type KafkaType = kafkaJsTypes.Kafka
-type EachMessagePayload = kafkaJsTypes.EachMessagePayload
-type Consumer = kafkaJsTypes.Consumer
+// Yeah, this doesn't look good. It tries to resolve a CommonJS vs ES Modules error
+// that leads to a "TS2351: This expression is not constructable" error when doing
+// new LZ4Codec() if it is imported directly.
+// (See https://github.com/ajv-validator/ajv/issues/2132#issuecomment-1290409907)
+const LZ4Codec = kafkaJsLZ4.default
 
 // Kafkajs supports Gzip compression by default. LZ4-support is needed because
 // some of the producers suddenly started publishing LZ4-compressed messages.
 // Snappy is included because it seems fairly popular, and we want to prevent a
 // future crash like the one we got from LZ4.
-// @ts-ignore // TODO: type issues here
 CompressionCodecs[CompressionTypes.LZ4] = new LZ4Codec().codec
 CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 
@@ -53,7 +52,7 @@ export const connectToKafka = async (): Promise<{
     return { consumer, registry }
 }
 
-const getKafka = async (username: string, password: string): Promise<KafkaType> => {
+const getKafka = async (username: string, password: string): Promise<Kafka> => {
     const broker = KAFKA_BROKER || ''
     const clientId = `bff-kafka-client-${ENVIRONMENT}${localId}` // unique pr client
     const kafka = new Kafka({
