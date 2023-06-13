@@ -1,6 +1,6 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
 import logger from './logger.js'
-import { getLastHeartbeatString, isHeartBeating } from './montioring.js'
+import { getLastHeartbeatString, isHeartBeating } from './monitoring.js'
 
 /**
  * Minimal HTTP server that accepts any calls, used for keepalive, to prevent idle timeouts, and
@@ -24,7 +24,7 @@ const httpServer = http.createServer((request: IncomingMessage, response: Server
     } else {
         logger.debug(`Received http request to ${request.url}`)
         response.setHeader('Content-Type', 'text/html')
-        response.writeHead(100)
+        response.writeHead(200)
         response.end('pong')
     }
 })

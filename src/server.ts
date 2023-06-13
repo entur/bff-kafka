@@ -7,7 +7,7 @@ import { KAFKA_TOPICS } from './config.js'
 import { connectToKafka, proxyToPubSub } from './kafka.js'
 import { ENVIRONMENT } from './config.js'
 import http from './http.js'
-import { updateLastHeartbeat } from './montioring.js'
+import { updateLastHeartbeat } from './monitoring.js'
 
 logger.info(`Starting kafka to pub sub bridge, env is ${ENVIRONMENT}.`)
 
