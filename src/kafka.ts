@@ -1,8 +1,7 @@
-// types for Snappy are missing, but we don't need them
-// @ts-ignore
+// @ts-ignore Types for Snappy are missing, but we don't need them
 import SnappyCodec from 'kafkajs-snappy'
-import kafkaJsLZ4 from 'kafkajs-lz4'
-import { Kafka, CompressionTypes, CompressionCodecs } from 'kafkajs'
+import LZ4Codec from 'kafkajs-lz4'
+import kafkajs, { Kafka, CompressionTypes } from 'kafkajs'
 import type { EachMessagePayload, Consumer } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 
@@ -15,16 +14,18 @@ import { WinstonLogCreator } from './kafkajsWinstonLogger.js'
 import { getSecret } from './secrets.js'
 import logger from './logger.js'
 
-// Yeah, this doesn't look good. It tries to resolve a CommonJS vs ES Modules error
-// that leads to a "TS2351: This expression is not constructable" error when doing
-// new LZ4Codec() if it is imported directly.
-// (See https://github.com/ajv-validator/ajv/issues/2132#issuecomment-1290409907)
-const LZ4Codec = kafkaJsLZ4.default
+// For some CommonJS-related reason we get the following if we try to import CompressionCodecs directly:
+// SyntaxError: Named export 'CompressionCodecs' not found. The requested module 'kafkajs' is a CommonJS module,
+// which may not support all module.exports as named exports.
+// CommonJS modules can always be imported via the default export
+//  -- thus we have to do it in two steps.
+const { CompressionCodecs } = kafkajs
 
 // Kafkajs supports Gzip compression by default. LZ4-support is needed because
 // some of the producers suddenly started publishing LZ4-compressed messages.
 // Snappy is included because it seems fairly popular, and we want to prevent a
 // future crash like the one we got from LZ4.
+// @ts-ignore Ts says that LZ4Codec is not constructable, but it is.
 CompressionCodecs[CompressionTypes.LZ4] = new LZ4Codec().codec
 CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 

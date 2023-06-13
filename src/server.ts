@@ -7,6 +7,7 @@ import { KAFKA_TOPICS } from './config.js'
 import { connectToKafka, proxyToPubSub } from './kafka.js'
 import { ENVIRONMENT } from './config.js'
 import http from './http.js'
+import { updateLastHeartbeat } from './monitoring.js'
 
 logger.info(`Starting kafka to pub sub bridge, env is ${ENVIRONMENT}.`)
 
@@ -14,6 +15,8 @@ logger.info(`Starting kafka to pub sub bridge, env is ${ENVIRONMENT}.`)
 http()
 
 const { consumer, registry } = await connectToKafka()
+consumer.on('consumer.crash', () => logger.error('Oh damn, the Kafka consumer crashed!'))
+consumer.on('consumer.heartbeat', updateLastHeartbeat)
 
 const topics = KAFKA_TOPICS.split(',').map((topic) => topic.trim())
 try {
