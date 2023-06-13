@@ -1,4 +1,5 @@
-const threshold = 3 * 60 * 1000
+const MINUTE = 60000
+const threshold = 3 * MINUTE
 let lastHeartbeat = Date.now()
 export const updateLastHeartbeat = (): void => {
     lastHeartbeat = Date.now()
