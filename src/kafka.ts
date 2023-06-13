@@ -2,7 +2,8 @@
 // @ts-ignore
 import SnappyCodec from 'kafkajs-snappy'
 import kafkaJsLZ4 from 'kafkajs-lz4'
-import { Kafka, CompressionTypes, CompressionCodecs } from 'kafkajs'
+import kafkajs, { Kafka, CompressionTypes } from 'kafkajs'
+
 import type { EachMessagePayload, Consumer } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 
@@ -20,6 +21,13 @@ import logger from './logger.js'
 // new LZ4Codec() if it is imported directly.
 // (See https://github.com/ajv-validator/ajv/issues/2132#issuecomment-1290409907)
 const LZ4Codec = kafkaJsLZ4.default
+
+// For some CommonJS-related reason we get the following if we try to import CompressionCodecs directly:
+// SyntaxError: Named export 'CompressionCodecs' not found. The requested module 'kafkajs' is a CommonJS module,
+// which may not support all module.exports as named exports.
+// CommonJS modules can always be imported via the default export
+//  -- thus we have to do it in two steps.
+const { CompressionCodecs } = kafkajs
 
 // Kafkajs supports Gzip compression by default. LZ4-support is needed because
 // some of the producers suddenly started publishing LZ4-compressed messages.
