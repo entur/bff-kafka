@@ -15,15 +15,11 @@ logger.info(`Starting kafka to pub sub bridge, env is ${ENVIRONMENT}.`)
 http()
 
 const { consumer, registry } = await connectToKafka()
+consumer.on('consumer.crash', () => logger.error('Oh damn, the Kafka consumer crashed!'))
+consumer.on('consumer.heartbeat', updateLastHeartbeat)
 
 const topics = KAFKA_TOPICS.split(',').map((topic) => topic.trim())
 try {
-    consumer.on('consumer.crash', () => {
-        logger.error('Oh damn, the Kafka consumer crashed!')
-    })
-    consumer.on('consumer.heartbeat', () => {
-        updateLastHeartbeat()
-    })
     await proxyToPubSub(consumer, registry, topics)
     logger.info(`The consumer is listening.`)
 } catch (err) {

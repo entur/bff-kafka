@@ -13,16 +13,13 @@ const httpServer = http.createServer((request: IncomingMessage, response: Server
         if (isHeartBeating()) {
             const message = `Kafka consumer heart is beating, last time was ${getLastHeartbeatString()}`
             response.writeHead(200)
-            logger.debug(message)
             response.end(message)
         } else {
             const message = `Kafka consumer seems dead. Last heartbeat was at ${getLastHeartbeatString()}`
-            logger.error(message)
             response.writeHead(503)
             response.end(message)
         }
     } else {
-        logger.debug(`Received http request to ${request.url}`)
         response.setHeader('Content-Type', 'text/html')
         response.writeHead(200)
         response.end('pong')
