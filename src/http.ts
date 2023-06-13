@@ -11,13 +11,15 @@ const httpServer = http.createServer((request: IncomingMessage, response: Server
         response.setHeader('Content-Type', 'text/html')
 
         if (isHeartBeating()) {
-            const message = `Kafka consumer heart is beating, last time was ${getLastHeartbeatString()}`
             response.writeHead(200)
-            response.end(message)
+            response.end(
+                `Kafka consumer heart is beating, last time was ${getLastHeartbeatString()}`,
+            )
         } else {
-            const message = `Kafka consumer seems dead. Last heartbeat was at ${getLastHeartbeatString()}`
             response.writeHead(503)
-            response.end(message)
+            response.end(
+                `Kafka consumer seems dead. Last heartbeat was at ${getLastHeartbeatString()}`,
+            )
         }
     } else {
         response.setHeader('Content-Type', 'text/html')
