@@ -28,8 +28,28 @@ function deploy {
     echo " 🧵  Linting ..."
     npm run lint
 
-    echo " 🚢 Deploying BFF Kafka to $ENV ..."
-    npm run build:$ENV && gcloud app deploy app-$ENV.yaml cron.yaml --project=$PROJECT --quiet
+    echo " 🚢  Deploying BFF Kafka to $ENV ..."
+    npm run build:$ENV && gcloud app deploy app-$ENV.yaml --project=$PROJECT --quiet
+
+    echo " ⏰  Creating cron jobs ..."
+    # The urls below do not exist in the app. Instead, all urls are accepted and url inspected in http.ts.
+    # Cron-triggered calls bypass the firewall btw.
+
+    KEEPALIVE_JOB="bff-kafka-keepalive"
+    if gcloud scheduler jobs list --project=$PROJECT | grep -c $KEEPALIVE_JOB; then
+        echo " 🗑️  Deleting existing keep-alive cron job $HAS_KAFKA_KEEPALIVE..."
+        gcloud scheduler jobs delete $KEEPALIVE_JOB --quiet --location="us-central1" --project=$PROJECT
+    fi
+    echo " 👷🏻‍♀️ Creating keep-alive cron job ..."
+    gcloud scheduler jobs create app-engine $KEEPALIVE_JOB --service="bff-kafka" --schedule="every 5 mins" --relative-url="/bff-kafka/keepalive" --http-method=GET --description="Tic, toc, I'm a clock. I prevent bff-kafka from idle timeouts." --project=$PROJECT
+
+    HEARTBEAT_JOB="bff-kafka-heartbeat"
+    if gcloud scheduler jobs list --project=$PROJECT | grep -c $HEARTBEAT_JOB; then
+        echo " 🗑️  Deleting existing heartbeat cron job ..."
+        gcloud scheduler jobs delete $HEARTBEAT_JOB --quiet --location="us-central1" --project=$PROJECT
+    fi
+    echo " 👷🏻‍♀️ Creating heartbeat cron job ..."
+    gcloud scheduler jobs create app-engine $HEARTBEAT_JOB --service="bff-kafka" --schedule="every 1 mins" --relative-url="/bff-kafka/heartbeat" --http-method=GET --description="Can you feel a heartbeat, Doctor? No, he's dead, Jim." --project=$PROJECT
 
     echo " 💬 Posting message to Slack ..."
     slack_message $ENV
