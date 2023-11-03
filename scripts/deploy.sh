@@ -14,15 +14,19 @@ fi
 function deploy {
     ENV="${1:-dev}"
 
-    if ! [[ "$ENV" =~ ^(dev|staging|prod|beta|terraform)$ ]]; then
+    if ! [[ "$ENV" =~ ^(dev|staging|prod|beta)$ ]]; then
         echo -e "🙈 Invalid ENV: $ENV\n"
         exit 1
     fi
 
-    if [[ $ENV = "terraform" ]]; then
-        PROJECT="ent-selvbet-terraform-dev"
-    else
-        PROJECT="entur-$ENV"
+    if [[ $ENV = "dev" ]]; then
+        PROJECT="ent-enturapp-dev"
+    elif [[ $ENV = "staging" ]]; then
+        PROJECT="ent-enturapp-tst"
+    elif [[ $ENV = "beta" ]]; then
+        PROJECT="ent-enturbeta-prd"
+    elif [[ $ENV = "prod" ]]; then
+        PROJECT="entur-prod"
     fi
 
     echo " 🧵  Linting ..."
@@ -38,7 +42,7 @@ function deploy {
     KEEPALIVE_JOB="bff-kafka-keepalive"
     if gcloud scheduler jobs list --project=$PROJECT | grep -c $KEEPALIVE_JOB; then
         echo " 🗑️  Deleting existing keep-alive cron job $HAS_KAFKA_KEEPALIVE..."
-        gcloud scheduler jobs delete $KEEPALIVE_JOB --quiet --location="us-central1" --project=$PROJECT
+        gcloud scheduler jobs delete $KEEPALIVE_JOB --quiet --location="europe-west1" --project=$PROJECT
     fi
     echo " 👷🏻‍♀️ Creating keep-alive cron job ..."
     gcloud scheduler jobs create app-engine $KEEPALIVE_JOB --service="bff-kafka" --schedule="every 5 mins" --relative-url="/bff-kafka/keepalive" --http-method=GET --description="Tic, toc, I'm a clock. I prevent bff-kafka from idle timeouts." --project=$PROJECT
@@ -46,7 +50,7 @@ function deploy {
     HEARTBEAT_JOB="bff-kafka-heartbeat"
     if gcloud scheduler jobs list --project=$PROJECT | grep -c $HEARTBEAT_JOB; then
         echo " 🗑️  Deleting existing heartbeat cron job ..."
-        gcloud scheduler jobs delete $HEARTBEAT_JOB --quiet --location="us-central1" --project=$PROJECT
+        gcloud scheduler jobs delete $HEARTBEAT_JOB --quiet --location="europe-west1" --project=$PROJECT
     fi
     echo " 👷🏻‍♀️ Creating heartbeat cron job ..."
     gcloud scheduler jobs create app-engine $HEARTBEAT_JOB --service="bff-kafka" --schedule="every 1 mins" --relative-url="/bff-kafka/heartbeat" --http-method=GET --description="Can you feel a heartbeat, Doctor? No, he's dead, Jim." --project=$PROJECT
