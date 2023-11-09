@@ -10,6 +10,7 @@ const httpServer = http.createServer((request: IncomingMessage, response: Server
     if (request.url?.includes('heartbeat')) {
         response.setHeader('Content-Type', 'text/html')
 
+        logger.debug('Heart beat endpoint called', { lastHeartbeat: getLastHeartbeatString() })
         if (isHeartBeating()) {
             response.writeHead(200)
             response.end(
