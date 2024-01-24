@@ -3,8 +3,23 @@ set -e
 
 ENV="${1:-dev}"
 
+if ! [[ "$ENV" =~ ^(dev|staging|prod|beta)$ ]]; then
+    echo -e "🙈 Invalid ENV: $ENV\n"
+    exit 1
+fi
+
+if [[ $ENV = "dev" ]]; then
+    PROJECT="ent-enturapp-dev"
+elif [[ $ENV = "staging" ]]; then
+    PROJECT="ent-enturapp-tst"
+elif [[ $ENV = "beta" ]]; then
+    PROJECT="ent-enturbeta-prd"
+elif [[ $ENV = "prod" ]]; then
+    PROJECT="entur-prod"
+fi
+
 # path to environment specific credential keys used when looking up secrets
-export GOOGLE_APPLICATION_CREDENTIALS="$PWD/serviceAccountKeys/entur-$ENV.json"
+export GOOGLE_APPLICATION_CREDENTIALS="$PWD/serviceAccountKeys/$PROJECT.json"
 
 # Run transpile in a forked process
 npm run transpile -- --watch &
