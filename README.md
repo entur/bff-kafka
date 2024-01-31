@@ -23,7 +23,7 @@ See .env.prod/staging/dev/beta for configuration.
 
 KAFKA_TOPICS is a comma separated list of topics to subscribe to.
 
-See https://kafka-admin-api.entur.org/ui/clusters for a list of
+See https://entur-data-kafka-admin.entur.org//ui/clusters for a list of
 available topics
 
 In addition, the name of the events we want to forward to pubsub must be whitelisted

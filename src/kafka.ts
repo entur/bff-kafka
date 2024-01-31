@@ -8,6 +8,7 @@ import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler.js'
 import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler.js'
 import handlePaymentEvent from './eventHandlers/paymentEventHandler.js'
+import handleOrderEvent from './eventHandlers/orderEventHandler.js'
 
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config.js'
 import { WinstonLogCreator } from './kafkajsWinstonLogger.js'
@@ -43,7 +44,7 @@ export const connectToKafka = async (): Promise<{
     ])
 
     // kafka works as a message queue if multiple consumers share group id, meaning only one consumer will
-    // get a messsage. To prevent local runs interfering with production we add a localId.
+    // get a message. To prevent local runs interfering with production we add a localId.
     const groupId = `bff-kafka-${ENVIRONMENT}${localId}`
     const consumer = (await getKafka(username, password)).consumer({ groupId })
     const registry = getRegistry(username, password)
@@ -101,6 +102,8 @@ const messageHandler =
             await handleTicketDistributionGroupEvent(topic, message, messageValue)
         } else if (topic.startsWith('customer-changed')) {
             await handleCustomerChangedEvent(topic, message, messageValue)
+        } else if (topic.startsWith('order-events')) {
+            await handleOrderEvent(topic, message, messageValue)
         }
     }
 
