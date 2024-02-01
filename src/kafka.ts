@@ -1,6 +1,5 @@
 // @ts-ignore Types for Snappy are missing, but we don't need them
 import SnappyCodec from 'kafkajs-snappy'
-import LZ4Codec from 'kafkajs-lz4'
 import kafkajs, { Kafka, CompressionTypes } from 'kafkajs'
 import type { EachMessagePayload, Consumer } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
@@ -10,6 +9,7 @@ import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHand
 import handlePaymentEvent from './eventHandlers/paymentEventHandler.js'
 import handleOrderEvent from './eventHandlers/orderEventHandler.js'
 
+import lz4Codec from './codecs/lz4.js'
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config.js'
 import { WinstonLogCreator } from './kafkajsWinstonLogger.js'
 import { getSecret } from './secrets.js'
@@ -26,8 +26,7 @@ const { CompressionCodecs } = kafkajs
 // some of the producers suddenly started publishing LZ4-compressed messages.
 // Snappy is included because it seems fairly popular, and we want to prevent a
 // future crash like the one we got from LZ4.
-// @ts-ignore Ts says that LZ4Codec is not constructable, but it is.
-CompressionCodecs[CompressionTypes.LZ4] = new LZ4Codec().codec
+CompressionCodecs[CompressionTypes.LZ4] = () => lz4Codec
 CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 
 // having a local part of the id lets us run against other environments
