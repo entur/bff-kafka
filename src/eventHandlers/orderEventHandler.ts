@@ -1,14 +1,7 @@
 import logger from '../logger.js'
 import { publishMessage } from '../pubsub.js'
-import { ENTUR_POS_NATIVE, ENTUR_POS_WEB } from '../config.js'
 import eventsWhitelist from '../eventsWhitelist.js'
-import { removeEventNameLevelFromEvent } from './utils.js'
-
-const isForSelfService = (eventContents: any): boolean => {
-    const pos = eventContents.meta?.pos
-
-    return pos === ENTUR_POS_NATIVE || pos === ENTUR_POS_WEB
-}
+import { removeEventNameLevelFromEvent, isForSelfService } from './utils.js'
 
 const handleOrderEvent = async (topic: string, message: any, messageValue: any): Promise<void> => {
     const { type: eventName, event, correlationId, timestamp } = messageValue

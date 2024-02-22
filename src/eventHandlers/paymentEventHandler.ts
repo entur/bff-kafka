@@ -1,16 +1,7 @@
 import logger from '../logger.js'
 import { publishMessage } from '../pubsub.js'
-import { ENTUR_POS_NATIVE, ENTUR_POS_WEB } from '../config.js'
 import eventsWhitelist from '../eventsWhitelist.js'
-import { removeEventNameLevelFromEvent } from './utils.js'
-
-const isForSelfService = (eventContents: any): boolean => {
-    const pos = eventContents.meta?.pos
-
-    return (
-        pos === ENTUR_POS_NATIVE || pos === ENTUR_POS_WEB || pos === 'sales-process-manager-client'
-    )
-}
+import { removeEventNameLevelFromEvent, isForSelfService } from './utils.js'
 
 const handlePaymentEvent = async (
     topic: string,
@@ -25,7 +16,10 @@ const handlePaymentEvent = async (
 
     const eventContents = removeEventNameLevelFromEvent(event)
 
-    if (isForSelfService(eventContents)) {
+    if (
+        isForSelfService(eventContents) ||
+        eventContents.meta?.pos === 'sales-process-manager-client'
+    ) {
         logger.info(`Decoded avro value for ${eventName}`, {
             ...eventContents,
             correlationId,
