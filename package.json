@@ -24,7 +24,9 @@
         "deploy": "./scripts/deploy.sh",
         "ts": "tsc --noEmit",
         "transpile": "tsc",
-        "populate-env-vars": "node --loader ts-node/esm/transpile-only ./scripts/environment.ts"
+        "prettier": "prettier . --check",
+        "populate-env-vars": "node --loader ts-node/esm/transpile-only ./scripts/environment.ts",
+        "verify": "npm run ts && npm run lint && npm run prettier"
     },
     "dependencies": {
         "@google-cloud/logging-winston": "^4.0.1",
@@ -33,14 +35,15 @@
         "@google-cloud/trace-agent": "^5.1.1",
         "@kafkajs/confluent-schema-registry": "^2.0.1",
         "kafkajs": "^1.15.0",
-        "kafkajs-lz4": "^2.0.0-beta.0",
         "kafkajs-snappy": "^1.1.0",
+        "lz4": "^0.6.5",
         "uuid": "^8.3.2",
         "winston": "^3.3.3"
     },
     "devDependencies": {
-        "@tsconfig/node16": "^1.0.4",
-        "@types/node": "^16.11.25",
+        "@tsconfig/node18": "^18.2.2",
+        "@types/lz4": "^0.6.4",
+        "@types/node": "^20.11.10",
         "@types/uuid": "^8.3.3",
         "@typescript-eslint/eslint-plugin": "^5.6.0",
         "@typescript-eslint/parser": "^5.6.0",

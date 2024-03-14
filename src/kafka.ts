@@ -1,6 +1,5 @@
 // @ts-ignore Types for Snappy are missing, but we don't need them
 import SnappyCodec from 'kafkajs-snappy'
-import LZ4Codec from 'kafkajs-lz4'
 import kafkajs, { Kafka, CompressionTypes } from 'kafkajs'
 import type { EachMessagePayload, Consumer } from 'kafkajs'
 import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
@@ -8,7 +7,9 @@ import { SchemaRegistry } from '@kafkajs/confluent-schema-registry'
 import handleTicketDistributionGroupEvent from './eventHandlers/ticketDistributionGroupEventHandler.js'
 import handleCustomerChangedEvent from './eventHandlers/customerChangedEventHandler.js'
 import handlePaymentEvent from './eventHandlers/paymentEventHandler.js'
+import handleOrderEvent from './eventHandlers/orderEventHandler.js'
 
+import lz4Codec from './codecs/lz4.js'
 import { ENVIRONMENT, KAFKA_BROKER, KAFKA_SCHEMA_REGISTRY } from './config.js'
 import { WinstonLogCreator } from './kafkajsWinstonLogger.js'
 import { getSecret } from './secrets.js'
@@ -25,8 +26,7 @@ const { CompressionCodecs } = kafkajs
 // some of the producers suddenly started publishing LZ4-compressed messages.
 // Snappy is included because it seems fairly popular, and we want to prevent a
 // future crash like the one we got from LZ4.
-// @ts-ignore Ts says that LZ4Codec is not constructable, but it is.
-CompressionCodecs[CompressionTypes.LZ4] = new LZ4Codec().codec
+CompressionCodecs[CompressionTypes.LZ4] = () => lz4Codec
 CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 
 // having a local part of the id lets us run against other environments
@@ -43,7 +43,7 @@ export const connectToKafka = async (): Promise<{
     ])
 
     // kafka works as a message queue if multiple consumers share group id, meaning only one consumer will
-    // get a messsage. To prevent local runs interfering with production we add a localId.
+    // get a message. To prevent local runs interfering with production we add a localId.
     const groupId = `bff-kafka-${ENVIRONMENT}${localId}`
     const consumer = (await getKafka(username, password)).consumer({ groupId })
     const registry = getRegistry(username, password)
@@ -101,6 +101,8 @@ const messageHandler =
             await handleTicketDistributionGroupEvent(topic, message, messageValue)
         } else if (topic.startsWith('customer-changed')) {
             await handleCustomerChangedEvent(topic, message, messageValue)
+        } else if (topic.startsWith('order-events')) {
+            await handleOrderEvent(topic, message, messageValue)
         }
     }
 

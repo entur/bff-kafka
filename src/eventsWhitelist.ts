@@ -1,4 +1,5 @@
 const whitelistedEvents = [
+    'OrderConfirmed',
     'PaymentTransactionCaptured',
     'PaymentTransactionCancelled',
     'PaymentTransactionRejected',
