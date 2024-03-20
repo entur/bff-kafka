@@ -21,6 +21,7 @@
         "build:staging": "tsc && npm run populate-env-vars staging",
         "build:prod": "tsc && npm run populate-env-vars prod",
         "build:beta": "tsc && npm run populate-env-vars beta",
+        "build:int": "tsc && npm run populate-env-vars int",
         "deploy": "./scripts/deploy.sh",
         "ts": "tsc --noEmit",
         "transpile": "tsc",

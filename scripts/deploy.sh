@@ -14,7 +14,7 @@ fi
 function deploy {
     ENV="${1:-dev}"
 
-    if ! [[ "$ENV" =~ ^(dev|staging|prod|beta)$ ]]; then
+    if ! [[ "$ENV" =~ ^(dev|staging|prod|beta|int)$ ]]; then
         echo -e "🙈 Invalid ENV: $ENV\n"
         exit 1
     fi
@@ -27,6 +27,8 @@ function deploy {
         PROJECT="ent-enturbeta-prd"
     elif [[ $ENV = "prod" ]]; then
         PROJECT="entur-prod"
+    elif [[ $ENV = "int" ]]; then
+        PROJECT="ent-enturint-dev"
     fi
 
     echo " 🧵  Linting ..."

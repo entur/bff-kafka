@@ -3,7 +3,7 @@ set -e
 
 ENV="${1:-dev}"
 
-if ! [[ "$ENV" =~ ^(dev|staging|prod|beta)$ ]]; then
+if ! [[ "$ENV" =~ ^(dev|staging|prod|beta|int)$ ]]; then
     echo -e "🙈 Invalid ENV: $ENV\n"
     exit 1
 fi
@@ -16,6 +16,8 @@ elif [[ $ENV = "beta" ]]; then
     PROJECT="ent-enturbeta-prd"
 elif [[ $ENV = "prod" ]]; then
     PROJECT="entur-prod"
+elif [[ $ENV = "int" ]]; then
+    PROJECT="ent-enturint-dev"
 fi
 
 # path to environment specific credential keys used when looking up secrets
