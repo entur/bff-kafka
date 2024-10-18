@@ -2,7 +2,7 @@
     "name": "@entur/bff-kafka",
     "version": "0.0.1",
     "private": true,
-    "description": "A backend that handles Entur Kafka integration for Entur clients.",
+    "description": "A backend that handles Entur KakakaKafka integration for Entur clients.",
     "author": "Entur AS",
     "type": "module",
     "engines": {
