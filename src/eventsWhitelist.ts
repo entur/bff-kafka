@@ -3,7 +3,7 @@ const whitelistedEvents = [
     'PaymentTransactionCaptured',
     'PaymentTransactionCancelled',
     'PaymentTransactionRejected',
-    'TicketDistributionCreated',
+    'TicketDistributionGroupCreated',
     'TicketDistributionAdded',
     'TicketDistributionCancelled',
     'TicketDistributionCancelledExternally',
